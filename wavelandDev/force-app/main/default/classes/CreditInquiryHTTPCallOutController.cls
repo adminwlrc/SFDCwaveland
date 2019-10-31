@@ -106,10 +106,10 @@ public with sharing class CreditInquiryHTTPCallOutController {
     * @since: 08/25/2019
     */
     public static void updateDemographicRecord(Map<String, String> resultValueMap, Id contactId, String serviceName){
-        wlrcm__Demographic__c demographicRecord = new wlrcm__Demographic__c();
+        wlrcm__Equifax__c demographicRecord = new wlrcm__Equifax__c();
         try{
-            Map<String,Id> recordTypeMap = GenericMethods.getRecordTypeMap('wlrcm__Demographic__c');
-            wlrcm__Demographic__c checkDemographicRecordExist = checkDemographicRecordExist(contactId,recordTypeMap.get(serviceName));
+            Map<String,Id> recordTypeMap = GenericMethods.getRecordTypeMap('wlrcm__Equifax__c');
+            wlrcm__Equifax__c checkDemographicRecordExist = checkDemographicRecordExist(contactId,recordTypeMap.get(serviceName));
             
             demographicRecord.wlrcm__RetrievedTime__c = System.now();
             demographicRecord.RecordTypeId = recordTypeMap.get(serviceName); 
@@ -136,11 +136,11 @@ public with sharing class CreditInquiryHTTPCallOutController {
     * @since: 08/25/2019
     *
     **/
-    public static wlrcm__Demographic__c checkDemographicRecordExist(Id contactId, String recordTypeId){
+    public static wlrcm__Equifax__c checkDemographicRecordExist(Id contactId, String recordTypeId){
 
         try{
-            wlrcm__Demographic__c checkDemographicRecordExist = [SELECT Id 
-                                                                    FROM wlrcm__Demographic__c 
+            wlrcm__Equifax__c checkDemographicRecordExist = [SELECT Id 
+                                                                    FROM wlrcm__Equifax__c 
                                                                     WHERE wlrcm__Patient__c =: contactId 
                                                                     AND  RecordTypeId =: recordTypeId
                                                                     LIMIT 1];
