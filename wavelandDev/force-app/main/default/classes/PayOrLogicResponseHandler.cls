@@ -15,9 +15,9 @@ public with sharing class PayOrLogicResponseHandler {
     * @purpose=> 
     * @created date=> 
     ================================================*/
-    public static void handleResponse(String response){
-        Map<String, Object> responseMap = (Map<String, Object>)System.JSON.deserializeUntyped(json);
-        System.debug('Check responseMap : '+responseMap);
+    public static void handleResponse(){
+        Map<String, Object> responseObj = (Map<String, Object>)System.JSON.deserializeUntyped(json);
+        createIndividuals(responseObj);
     }
     /* ================================================
     * @Method Name => getElementWithFieldMapping
@@ -34,7 +34,7 @@ public with sharing class PayOrLogicResponseHandler {
                 elementWithFieldMapping.put(el.wlrcm__NodeName__c, new Map<String, String>{el.wlrcm__ElementName__c => el.wlrcm__FieldName__c});
             }
         }
-        System.debug('Check 1 : '+elementWithFieldMapping );
+        // System.debug('Check 1 : '+elementWithFieldMapping );
         return elementWithFieldMapping;
     }
 
@@ -44,12 +44,38 @@ public with sharing class PayOrLogicResponseHandler {
     * @purpose=> 
     * @created date=> 
     ================================================*/
-    public static void upsertObject(List<Object> individualNode){
-        List<wlrcm__PayOrLogic__c> upsertList = new List<wlrcm__PayOrLogic__c>();
-        for(Object obj : individualNode){
-
+    public static void createIndividuals(Map<String, Object> responseObj ){
+        System.debug('Check individualsObj : '+responseObj);
+        List<Object> individualsObj = (List<Object>)responseObj.get('Individuals');
+        List<wlrcm__PayOrLogic__c> payOrLogicRecords = new List<wlrcm__PayOrLogic__c>();
+        
+        Map<String, Map<String, String>> elementWithFieldMapping = getElementWithFieldMapping();
+        Map<String, String> individualMapping = elementWithFieldMapping.get('Individuals');
+        Map<String, String> guarantorMapping = elementWithFieldMapping.get('Guarantor');
+        Map<String, String> insuranceFinderMapping = elementWithFieldMapping.get('InsuranceFinder');
+        wlrcm__PayOrLogic__c pol;
+        for(Object jsonObj : individualsObj){
+            pol = new wlrcm__PayOrLogic__c();
+            Map<String,Object> individualObj = (Map<String,Object>)jsonObj;
+            Map<String,Object> guarantorObj = (Map<String,Object>)individualObj.get('Guarantor');
+            Map<String,Object> insuranceFinderObj = (Map<String,Object>)individualObj.get('InsuranceFinder');
+            for(String str : individualMapping.keySet()){
+                pol.put(individualMapping.get(str), String.valueOf(individualObj.get(str)));
+            }
+            for(String str : guarantorMapping.keySet()){
+                pol.put(guarantorMapping.get(str), String.valueOf(guarantorObj.get(str)));
+            }
+            for(String str : insuranceFinderMapping.keySet()){
+                pol.put(insuranceFinderMapping.get(str), String.valueOf(insuranceFinderObj.get(str)));
+            }
+            payOrLogicRecords.add(pol);
         }
-
+        if(payOrLogicRecords != NULL){
+            payOrLogicRecords[0].Id = 'a033i000006HDlHAAW';
+            update payOrLogicRecords;
+        }
+        System.debug('Check pol : '+ pol);
+       
     }
 
 }
