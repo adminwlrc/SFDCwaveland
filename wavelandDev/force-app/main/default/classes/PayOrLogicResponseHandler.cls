@@ -72,7 +72,7 @@ public with sharing class PayOrLogicResponseHandler {
         }
         if(payOrLogicRecords != NULL){
             payOrLogicRecords[0].Id = 'a033i000006HDlHAAW';
-            update payOrLogicRecords;
+            upsert payOrLogicRecords;
         }
         System.debug('Check pol : '+ pol);
        

@@ -10,45 +10,54 @@ public with sharing class PayOrLogicRequestHandler {
   
     public static String createJSONRequest(List<Id> contactIds){
         String jsonRequest;
-        Map<String, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeKeyAndValue = getNodeKeyAndValue();
-        List<Contact> individuals = getContacts(contactIds , nodeKeyAndValue);
-        Map<String, Object> requestData = getRequestData(nodeKeyAndValue.get('requestData'));
-        Map<String, Object> eligibilitiesData = getEligibilitiesData(nodeKeyAndValue.get('Eligibilities'));
-        Map<String, Object> demographicData = getDemographicData(nodeKeyAndValue.get('Demographic'));
-        Map<String, Object> insuranceFinder = getInsuranceFinderData(nodeKeyAndValue.get('InsuranceFinder'));
+        Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeElementAndFieldAPI = getNodeElementAndFieldAPI();
+        List<Contact> individuals = getContacts(contactIds , nodeElementAndFieldAPI);
+        Map<String, Object> productData = getProductData(nodeElementAndFieldAPI.get('productData'));
+        Map<String, List<Object>> individualData = getIndividualData(individuals, nodeElementAndFieldAPI.get('Individuals'));
+        Map<String, Object> guarantorData = getGuarantorData(individuals[0], nodeElementAndFieldAPI.get('Guarantor'));
+        Map<String, Object> demographicData = getDemographicData(nodeElementAndFieldAPI.get('Demographic'));
+        Map<String, Object> insuranceFinderData = getInsuranceFinderData(nodeElementAndFieldAPI.get('InsuranceFinder'));
 
-        Map<String, List<Object>> individualData = individualData(individuals, elementAndFieldAPI(nodeKeyAndValue.get('Individuals') ));
-        Map<String, Object> productData = new Map<String, Object>();
-        productData.putAll(requestData);
-        productData.putAll(individualData);
-        productData.putAll(eligibilitiesData);
-        productData.putAll(demographicData);
-        productData.putAll(insuranceFinder);
-        jsonRequest = JSON.serialize(productData);
-
-        return jsonRequest;
+        String productDatajsonRequest= JSON.serializePretty(productData);
+        String individualDatajsonRequest = JSON.serializePretty(individualData);
+        String guarantorDatajsonRequest = JSON.serializePretty(guarantorData);
+        String demographicDatajsonRequest= JSON.serializePretty(demographicData);
+        String insuranceFinderDatajsonRequest= JSON.serializePretty(insuranceFinderData);
+        productDatajsonRequest = productDatajsonRequest.trim();
+        individualDatajsonRequest = individualDatajsonRequest.trim();
+        guarantorDatajsonRequest = guarantorDatajsonRequest.trim();
+        demographicDatajsonRequest = demographicDatajsonRequest.trim();
+        insuranceFinderDatajsonRequest = insuranceFinderDatajsonRequest.trim();
+        productDatajsonRequest = productDatajsonRequest.remove('}');
+        individualDatajsonRequest = individualDatajsonRequest.remove(']').remove('}').removeStart('{');
+        guarantorDatajsonRequest = guarantorDatajsonRequest.removeEnd('}').removeStart('{');
+        demographicDatajsonRequest = demographicDatajsonRequest.removeEnd('}').removeStart('{');
+        insuranceFinderDatajsonRequest = insuranceFinderDatajsonRequest.removeEnd('}').removeStart('{');
+       System.debug('Check productDatajsonRequest : '+ productDatajsonRequest);
+       jsonRequest = productDatajsonRequest + ','+individualDatajsonRequest+','+guarantorDatajsonRequest+ '}],'+demographicDatajsonRequest+','+insuranceFinderDatajsonRequest+'}}';
+        return jsonRequest.trim();
     }
     /* ================================================
-    * @Method Name => getNodeKeyAndValue
+    * @Method Name => getNodeElementAndFieldAPI
     * @author => Admin
     * @purpose=> This method will query all of the elements in the Custom Metadata wlrcm__PayOrLogicJSONRequestFieldMapping__mdt
+    * @and build a map with the Node name and the element and field api
     * @created date=> 
     ================================================*/
-    public static Map<String, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> getNodeKeyAndValue(){
-        Map<String, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeKeyAndValue = new Map<String, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>>();
+    public static Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> getNodeElementAndFieldAPI(){
+        Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeElementAndFieldAPI = new  Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>>();
         for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : [SELECT Id, wlrcm__ElementName__c, wlrcm__NodeName__c, wlrcm__FieldMappingAPI__c, wlrcm__Value__c
                                                                                                 FROM wlrcm__PayOrLogicJSONRequestFieldMapping__mdt
                                                                                                 ORDER BY wlrcm__Sort__c ASC NULLS LAST 
                                                                                                 LIMIT 50000]){
-            if(nodeKeyAndValue.containsKey(pl.wlrcm__NodeName__c)){
-                nodeKeyAndValue.get(pl.wlrcm__NodeName__c).add(pl); 
+            if(nodeElementAndFieldAPI.containsKey(pl.wlrcm__NodeName__c)){
+                nodeElementAndFieldAPI.get(pl.wlrcm__NodeName__c).add(pl); 
             }else{
-                System.debug('Check node '+pl.wlrcm__NodeName__c);
-                nodeKeyAndValue.put(pl.wlrcm__NodeName__c, new List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>{pl});
+                nodeElementAndFieldAPI.put(pl.wlrcm__NodeName__c, new List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>{pl});
             }
         }
 
-        return nodeKeyAndValue;
+        return nodeElementAndFieldAPI;
     }
      /* ================================================
     * @Method Name => getContacts
@@ -56,57 +65,47 @@ public with sharing class PayOrLogicRequestHandler {
     * @purpose=> This method will query all of the contacts/patients with the fields indicated  in the Custom Metadata wlrcm__PayOrLogicJSONRequestFieldMapping__mdt
     * @created date=> 
     ================================================*/
-    public static List<Contact> getContacts(List<Id> contactIds, Map<String, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeKeyAndValue){
+    public static List<Contact> getContacts(List<Id> contactIds,  Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeElementAndFieldAPI){
 
         String queryStr='SELECT Id, ';
-        for(String nodeName : nodeKeyAndValue.keySet()){
-            for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt str : nodeKeyAndValue.get(nodeName)){
-                if(str.wlrcm__FieldMappingAPI__c != NULL){
-                     queryStr += str.wlrcm__FieldMappingAPI__c + ', ';
+        for(String nodeName : nodeElementAndFieldAPI.keySet()){
+            for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : nodeElementAndFieldAPI.get(nodeName)){
+                if(pl.wlrcm__FieldMappingAPI__c != NULL){
+                    queryStr += pl.wlrcm__FieldMappingAPI__c+ ', ';
                 }
-              
             }
         }
         queryStr = queryStr.removeEnd( ', ');
         queryStr+=' FROM Contact';
         queryStr+=' WHERE Id IN : contactIds';
         queryStr+=' LIMIT 50000';
+        System.debug('Check queryStr : '+ queryStr);
         List<Contact> contacts = Database.query(queryStr);
         
         return contacts;
     }
-
-   /* ================================================
-    * @Method Name => elementAndFieldAPI
-    * @author => Admin
-    * @purpose=> This method will help individualData method. It associate the Key alue in the custom metadata with the contact information.
-    * @created date=> 
-    ================================================*/
-    public static Map<String, String> elementAndFieldAPI(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> elementRecords){
-        Map<String, String> elementAndFieldAPI = new Map<String, String>();
-        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : elementRecords){
-            elementAndFieldAPI.put(String.valueOf(pl.wlrcm__ElementName__c), String.valueOf(pl.wlrcm__FieldMappingAPI__c));
-        }
-
-        return elementAndFieldAPI;
-    }
     /* ================================================
-    * @Method Name => getRequestData
+    * @Method Name => getproductData
     * @author => Admin
-    * @purpose=> This method construct the requestData node in the JSON request.  
+    * @purpose=> This method construct the productData node in the JSON request.  
     * @created date=> 
     ================================================*/
-    public static Map<String, Object> getRequestData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeKeyAndValue){
-        Map<String, Object> requestData = new Map<String, Object>();
-        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : nodeKeyAndValue){
-            if(pl.wlrcm__ElementName__c ==  'RequestDate'){
-                requestData.put( pl.wlrcm__ElementName__c, Datetime.now().format('MM/dd/yyyy\' \'HH:mm:ss'));
-            }else{
-                requestData.put( pl.wlrcm__ElementName__c, pl.wlrcm__Value__c);
+    public static Map<String, Map<String, Object>> getProductData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeElementAndFieldAPI){
+        
+        Map<String, Object> tmp = new Map<String, Object>();
+        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt obj : nodeElementAndFieldAPI){
+            if(obj.wlrcm__ElementName__c ==  'RequestDate'){
+                tmp.put( obj.wlrcm__ElementName__c, Datetime.now().format('MM/dd/yyyy\' \'HH:mm:ss'));
+            }
+            if(obj.wlrcm__ElementName__c ==  'TransactionId'){
+                tmp.put(obj.wlrcm__ElementName__c, 'Put an Id here ');
+            }
+            if(obj.wlrcm__ElementName__c ==  'RequestingSoftware'){
+                tmp.put(obj.wlrcm__ElementName__c, obj.wlrcm__Value__c);
             }
         }
-
-        return requestData;
+        Map<String, Map<String, Object>> productData = new Map<String, Map<String, Object>>{'productData' => tmp };
+        return productData;
     }
     /* ================================================
     * @Method Name => individualData
@@ -114,14 +113,14 @@ public with sharing class PayOrLogicRequestHandler {
     * @purpose=> This method will construct the JSON Indivvidual objects
     * @created date=> 
     ================================================*/
-    public static  Map<String, List<Object>> individualData( List<Contact> individuals, Map<String, String> individualElementAndFieldAPI){
-            System.debug('Check 1 : '+individualElementAndFieldAPI);
+    public static  Map<String, List<Object>> getIndividualData( List<Contact> individuals, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> individualElementAndFieldAPI){
+        // System.debug('Check 1 : '+individualElementAndFieldAPI);
         Map<String, Object> individualObject = new Map<String, Object>();
         Map<String, List<Object>> individualData = new Map<String, List<Object>>();
         
         for(Contact ind : individuals){
-            for(String str : individualElementAndFieldAPI.keySet()){
-                individualObject.put(str, ind.get(individualElementAndFieldAPI.get(str)));
+            for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt ief : individualElementAndFieldAPI){
+                individualObject.put(ief.wlrcm__ElementName__c, ind.get(ief.wlrcm__FieldMappingAPI__c));
             } 
             Map<String, Object> tmpObj = new Map<String, Object>();
             tmpObj.putAll(individualObject);
@@ -136,18 +135,25 @@ public with sharing class PayOrLogicRequestHandler {
         return individualData;
     } 
     /* ================================================
-    * @Method Name => getEligibilitiesData
+    * @Method Name => getGuarantorData
     * @author => Admin
     * @purpose=> This method construct the Eligibilities node in the JSON request.  
     * @created date=> 
     ================================================*/
-    public static Map<String, Object> getEligibilitiesData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeKeyAndValue){
+    public static Map<String, Map<String,Object>> getGuarantorData(Contact individual, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> guarantorElementAndFieldAPI){
 
-        Map<String, Object> eligibilitiesData = new Map<String, Object>();
-        Map<String, List<Object>> PayorData = new  Map<String, List<Object>>{nodeKeyAndValue[0].wlrcm__ElementName__c => new List<Object>{nodeKeyAndValue[0].wlrcm__Value__c}};
-        eligibilitiesData.put( 'Eligibilities',PayorData);
-
-        return eligibilitiesData;
+        Map<String, Object> guarantorObject = new Map<String, Object>();
+        Map<String, Map<String,Object>> guarantorData = new Map<String, Map<String, Object>>();
+        
+     
+        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt ief : guarantorElementAndFieldAPI){
+            guarantorObject.put(ief.wlrcm__ElementName__c, individual.get(ief.wlrcm__FieldMappingAPI__c));
+        } 
+       
+        guarantorData.put('Guarantor' , guarantorObject);
+        
+        
+        return guarantorData;
     }
     /* ================================================
     * @Method Name => getDemographicData
@@ -155,12 +161,13 @@ public with sharing class PayOrLogicRequestHandler {
     * @purpose=> This method construct the Demographic node in the JSON request.  
     * @created date=> 
     ================================================*/
-    public static Map<String, Object> getDemographicData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeKeyAndValue){
-        Map<String, Object> demographicData = new Map<String, Object>();
-        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : nodeKeyAndValue){
-           demographicData.put( pl.wlrcm__ElementName__c, pl.wlrcm__Value__c);
+    public static Map<String, Object> getDemographicData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeElementAndFieldAPI){
+        Map<String, Map<String,Object>> demographicData = new Map<String, Map<String, Object>>();
+        Map<String, Object> demographicObject = new Map<String, Object>();
+        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : nodeElementAndFieldAPI){
+           demographicObject.put( pl.wlrcm__ElementName__c, pl.wlrcm__Value__c);
         }
-
+            demographicData.put('Demographic', demographicObject);
         return demographicData;
     }
     /* ================================================
@@ -169,12 +176,13 @@ public with sharing class PayOrLogicRequestHandler {
     * @purpose=> This method construct the InsuranceFinder node in the JSON request.  
     * @created date=> 
     ================================================*/
-    public static Map<String, Object> getInsuranceFinderData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeKeyAndValue){
-        Map<String, Object> InsuranceFinderData = new Map<String, Object>();
-        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : nodeKeyAndValue){
-           InsuranceFinderData.put( pl.wlrcm__ElementName__c, pl.wlrcm__Value__c);
+    public static Map<String, Object> getInsuranceFinderData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeElementAndFieldAPI){
+        Map<String, Map<String,Object>> insuranceFinderData = new Map<String, Map<String, Object>>();
+        Map<String, Object> insuranceFinderObject = new Map<String, Object>();
+        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : nodeElementAndFieldAPI){
+           insuranceFinderObject.put( pl.wlrcm__ElementName__c, pl.wlrcm__Value__c);
         }
-
-        return InsuranceFinderData;
+            insuranceFinderData.put('InsuranceFinder', insuranceFinderObject);
+        return insuranceFinderData;
     }
 }
