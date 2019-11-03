@@ -15,29 +15,9 @@ public with sharing class PayOrLogicResponseHandler {
     * @purpose=> 
     * @created date=> 
     ================================================*/
-    public static void handleResponse(){
-        Map<String, Object> responseObj = (Map<String, Object>)System.JSON.deserializeUntyped(json);
+    public static void handleResponse(Map<String, Object> responseObj){
         createIndividuals(responseObj);
     }
-    /* ================================================
-    * @Method Name => getElementWithFieldMapping
-    * @author => Admin
-    * @purpose=> 
-    * @created date=> 
-    ================================================*/
-    public static Map<String, Map<String, String>> getElementWithFieldMapping(){
-        Map<String, Map<String, String>> elementWithFieldMapping = new Map<String, Map<String, String>>();
-        for(wlrcm__PayOrLogicJSONResponseFieldMapping__mdt el : [SELECT Id, wlrcm__ElementName__c, wlrcm__FieldName__c, wlrcm__NodeName__c FROM wlrcm__PayOrLogicJSONResponseFieldMapping__mdt LIMIT 50000]){
-            if(elementWithFieldMapping.containsKey(el.wlrcm__NodeName__c)){
-                elementWithFieldMapping.get(el.wlrcm__NodeName__c).put(el.wlrcm__ElementName__c,el.wlrcm__FieldName__c);
-            }else{
-                elementWithFieldMapping.put(el.wlrcm__NodeName__c, new Map<String, String>{el.wlrcm__ElementName__c => el.wlrcm__FieldName__c});
-            }
-        }
-        // System.debug('Check 1 : '+elementWithFieldMapping );
-        return elementWithFieldMapping;
-    }
-
     /* ================================================
     * @Method Name => upsertObject
     * @author => Admin
@@ -75,7 +55,25 @@ public with sharing class PayOrLogicResponseHandler {
             upsert payOrLogicRecords;
         }
         System.debug('Check pol : '+ pol);
-       
     }
-
+     /* ================================================
+    * @Method Name => getElementWithFieldMapping
+    * @author => Admin
+    * @purpose=> 
+    * @created date=> 
+    ================================================*/
+    public static Map<String, Map<String, String>> getElementWithFieldMapping(){
+        Map<String, Map<String, String>> elementWithFieldMapping = new Map<String, Map<String, String>>();
+        for(wlrcm__PayOrLogicJSONResponseFieldMapping__mdt el : [SELECT Id, wlrcm__ElementName__c, wlrcm__FieldName__c, wlrcm__NodeName__c 
+                                                                                                    FROM wlrcm__PayOrLogicJSONResponseFieldMapping__mdt 
+                                                                                                    LIMIT 50000]){
+            if(elementWithFieldMapping.containsKey(el.wlrcm__NodeName__c)){
+                elementWithFieldMapping.get(el.wlrcm__NodeName__c).put(el.wlrcm__ElementName__c,el.wlrcm__FieldName__c);
+            }else{
+                elementWithFieldMapping.put(el.wlrcm__NodeName__c, new Map<String, String>{el.wlrcm__ElementName__c => el.wlrcm__FieldName__c});
+            }
+        }
+        // System.debug('Check 1 : '+elementWithFieldMapping );
+        return elementWithFieldMapping;
+    }
 }
