@@ -7,7 +7,6 @@
  * @last modified by => 
  ================================================*/
 public with sharing class PayOrLogicRequestHandler {
-
     /* ================================================
     * @Method Name => createJSONRequest
     * @author => Admin
@@ -58,9 +57,10 @@ public with sharing class PayOrLogicRequestHandler {
     ================================================*/
     public static  List<Map<String, Object>> getIndividualObjects( List<Contact> individuals, Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeElementAndFieldAPI){
         
-        Map<String, Object> individualObject = new Map<String, Object>();
+        
         List<Map<String, Object>> individualObjects = new List<Map<String, Object>>();
         for(Contact ind : individuals){
+            Map<String, Object> individualObject = new Map<String, Object>();
             for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt ief : nodeElementAndFieldAPI.get('Individuals')){
                 individualObject.put(ief.wlrcm__ElementName__c, String.valueOf(ind.get(ief.wlrcm__FieldMappingAPI__c)));
             } 
