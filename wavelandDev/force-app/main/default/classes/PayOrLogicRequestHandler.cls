@@ -7,7 +7,6 @@
  * @last modified by => 
  ================================================*/
 public with sharing class PayOrLogicRequestHandler {
-
     /* ================================================
     * @Method Name => createJSONRequest
     * @author => Admin
