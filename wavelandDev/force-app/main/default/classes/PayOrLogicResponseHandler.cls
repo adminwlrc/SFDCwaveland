@@ -16,7 +16,8 @@ public with sharing class PayOrLogicResponseHandler {
     * @created date=> 
     ================================================*/
     public static void handleResponse(Map<String, Object> responseObj){
-        createIndividuals(responseObj);
+        Map<String, Map<String, String>> elementWithFieldMapping = getElementWithFieldMapping();
+        createIndividuals(responseObj, elementWithFieldMapping);
     }
     /* ================================================
     * @Method Name => upsertObject
@@ -24,37 +25,35 @@ public with sharing class PayOrLogicResponseHandler {
     * @purpose=> 
     * @created date=> 
     ================================================*/
-    public static void createIndividuals(Map<String, Object> responseObj ){
-        System.debug('Check individualsObj : '+responseObj);
+    public static void createIndividuals(Map<String, Object> responseObj, Map<String, Map<String, String>> elementWithFieldMapping){
+
         List<Object> individualsObj = (List<Object>)responseObj.get('Individuals');
         List<wlrcm__PayOrLogic__c> payOrLogicRecords = new List<wlrcm__PayOrLogic__c>();
-        
-        Map<String, Map<String, String>> elementWithFieldMapping = getElementWithFieldMapping();
         Map<String, String> individualMapping = elementWithFieldMapping.get('Individuals');
         Map<String, String> guarantorMapping = elementWithFieldMapping.get('Guarantor');
         Map<String, String> insuranceFinderMapping = elementWithFieldMapping.get('InsuranceFinder');
-        wlrcm__PayOrLogic__c pol;
+        wlrcm__PayOrLogic__c payOrLogicRecord;
         for(Object jsonObj : individualsObj){
-            pol = new wlrcm__PayOrLogic__c();
+            payOrLogicRecord = new wlrcm__PayOrLogic__c();
             Map<String,Object> individualObj = (Map<String,Object>)jsonObj;
             Map<String,Object> guarantorObj = (Map<String,Object>)individualObj.get('Guarantor');
             Map<String,Object> insuranceFinderObj = (Map<String,Object>)individualObj.get('InsuranceFinder');
             for(String str : individualMapping.keySet()){
-                pol.put(individualMapping.get(str), String.valueOf(individualObj.get(str)));
+                payOrLogicRecord.put(individualMapping.get(str), String.valueOf(individualObj.get(str)));
             }
             for(String str : guarantorMapping.keySet()){
-                pol.put(guarantorMapping.get(str), String.valueOf(guarantorObj.get(str)));
+                payOrLogicRecord.put(guarantorMapping.get(str), String.valueOf(guarantorObj.get(str)));
             }
             for(String str : insuranceFinderMapping.keySet()){
-                pol.put(insuranceFinderMapping.get(str), String.valueOf(insuranceFinderObj.get(str)));
+                payOrLogicRecord.put(insuranceFinderMapping.get(str), String.valueOf(insuranceFinderObj.get(str)));
             }
-            payOrLogicRecords.add(pol);
+            payOrLogicRecords.add(payOrLogicRecord);
         }
         if(payOrLogicRecords != NULL){
             payOrLogicRecords[0].Id = 'a033i000006HDlHAAW';
             upsert payOrLogicRecords;
         }
-        System.debug('Check pol : '+ pol);
+        System.debug('Check pol : '+ payOrLogicRecords);
     }
      /* ================================================
     * @Method Name => getElementWithFieldMapping
@@ -73,7 +72,6 @@ public with sharing class PayOrLogicResponseHandler {
                 elementWithFieldMapping.put(el.wlrcm__NodeName__c, new Map<String, String>{el.wlrcm__ElementName__c => el.wlrcm__FieldName__c});
             }
         }
-        // System.debug('Check 1 : '+elementWithFieldMapping );
         return elementWithFieldMapping;
     }
 }
