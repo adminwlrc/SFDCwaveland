@@ -12,30 +12,35 @@ public with sharing class PayOrLogicRequestHandler {
         String jsonRequest;
         Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeElementAndFieldAPI = getNodeElementAndFieldAPI();
         List<Contact> individuals = getContacts(contactIds , nodeElementAndFieldAPI);
-        Map<String, Object> productData = getProductData(nodeElementAndFieldAPI.get('productData'));
-        Map<String, List<Object>> individualData = getIndividualData(individuals, nodeElementAndFieldAPI.get('Individuals'));
-        Map<String, Object> guarantorData = getGuarantorData(individuals[0], nodeElementAndFieldAPI.get('Guarantor'));
-        Map<String, Object> demographicData = getDemographicData(nodeElementAndFieldAPI.get('Demographic'));
-        Map<String, Object> insuranceFinderData = getInsuranceFinderData(nodeElementAndFieldAPI.get('InsuranceFinder'));
+        Map<String,Map<String, String>> productData = getProductData(nodeElementAndFieldAPI.get('productData'));
+        System.debug('Check 1 : '+productData);
+        Map<String, List<Map<String, String>>> individualData = getIndividualData(individuals, nodeElementAndFieldAPI.get('Individuals'));
+        System.debug('Check 2 : '+individualData);
+        Map<String, String> tmp = (Map<String, String>)individualData;
 
-        String productDatajsonRequest= JSON.serializePretty(productData);
-        String individualDatajsonRequest = JSON.serializePretty(individualData);
-        String guarantorDatajsonRequest = JSON.serializePretty(guarantorData);
-        String demographicDatajsonRequest= JSON.serializePretty(demographicData);
-        String insuranceFinderDatajsonRequest= JSON.serializePretty(insuranceFinderData);
-        productDatajsonRequest = productDatajsonRequest.trim();
-        individualDatajsonRequest = individualDatajsonRequest.trim();
-        guarantorDatajsonRequest = guarantorDatajsonRequest.trim();
-        demographicDatajsonRequest = demographicDatajsonRequest.trim();
-        insuranceFinderDatajsonRequest = insuranceFinderDatajsonRequest.trim();
-        productDatajsonRequest = productDatajsonRequest.remove('}');
-        individualDatajsonRequest = individualDatajsonRequest.remove(']').remove('}').removeStart('{');
-        guarantorDatajsonRequest = guarantorDatajsonRequest.removeEnd('}').removeStart('{');
-        demographicDatajsonRequest = demographicDatajsonRequest.removeEnd('}').removeStart('{');
-        insuranceFinderDatajsonRequest = insuranceFinderDatajsonRequest.removeEnd('}').removeStart('{');
-       System.debug('Check productDatajsonRequest : '+ productDatajsonRequest);
-       jsonRequest = productDatajsonRequest + ','+individualDatajsonRequest+','+guarantorDatajsonRequest+ '}],'+demographicDatajsonRequest+','+insuranceFinderDatajsonRequest+'}}';
-        return jsonRequest.trim();
+        // Map<String, Object> guarantorData = getGuarantorData(individuals[0], nodeElementAndFieldAPI.get('Guarantor'));
+    //     Map<String, Object> demographicData = getDemographicData(nodeElementAndFieldAPI.get('Demographic'));
+    //     Map<String, Object> insuranceFinderData = getInsuranceFinderData(nodeElementAndFieldAPI.get('InsuranceFinder'));
+
+    //     String productDatajsonRequest= JSON.serializePretty(productData);
+    //     String individualDatajsonRequest = JSON.serializePretty(individualData);
+    //     String guarantorDatajsonRequest = JSON.serializePretty(guarantorData);
+    //     String demographicDatajsonRequest= JSON.serializePretty(demographicData);
+    //     String insuranceFinderDatajsonRequest= JSON.serializePretty(insuranceFinderData);
+    //     productDatajsonRequest = productDatajsonRequest.trim();
+    //     individualDatajsonRequest = individualDatajsonRequest.trim();
+    //     guarantorDatajsonRequest = guarantorDatajsonRequest.trim();
+    //     demographicDatajsonRequest = demographicDatajsonRequest.trim();
+    //     insuranceFinderDatajsonRequest = insuranceFinderDatajsonRequest.trim();
+    //     productDatajsonRequest = productDatajsonRequest.remove('}');
+    //     individualDatajsonRequest = individualDatajsonRequest.remove(']').remove('}').removeStart('{');
+    //     guarantorDatajsonRequest = guarantorDatajsonRequest.removeEnd('}').removeStart('{');
+    //     demographicDatajsonRequest = demographicDatajsonRequest.removeEnd('}').removeStart('{');
+    //     insuranceFinderDatajsonRequest = insuranceFinderDatajsonRequest.removeEnd('}').removeStart('{');
+    //    System.debug('Check productDatajsonRequest : '+ productDatajsonRequest);
+    //    jsonRequest = productDatajsonRequest + ','+individualDatajsonRequest+','+guarantorDatajsonRequest+ '}],'+demographicDatajsonRequest+','+insuranceFinderDatajsonRequest+'}}';
+    //     return jsonRequest.trim();
+    return null;
     }
     /* ================================================
     * @Method Name => getNodeElementAndFieldAPI
@@ -90,9 +95,9 @@ public with sharing class PayOrLogicRequestHandler {
     * @purpose=> This method construct the productData node in the JSON request.  
     * @created date=> 
     ================================================*/
-    public static Map<String, Map<String, Object>> getProductData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeElementAndFieldAPI){
+    public static Map<String, Map<String, String>> getProductData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeElementAndFieldAPI){
         
-        Map<String, Object> tmp = new Map<String, Object>();
+        Map<String, String> tmp = new Map<String, String>();
         for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt obj : nodeElementAndFieldAPI){
             if(obj.wlrcm__ElementName__c ==  'RequestDate'){
                 tmp.put( obj.wlrcm__ElementName__c, Datetime.now().format('MM/dd/yyyy\' \'HH:mm:ss'));
@@ -104,7 +109,7 @@ public with sharing class PayOrLogicRequestHandler {
                 tmp.put(obj.wlrcm__ElementName__c, obj.wlrcm__Value__c);
             }
         }
-        Map<String, Map<String, Object>> productData = new Map<String, Map<String, Object>>{'productData' => tmp };
+        Map<String, Map<String, String>> productData = new Map<String, Map<String, String>>{'productData' => tmp };
         return productData;
     }
     /* ================================================
@@ -113,21 +118,21 @@ public with sharing class PayOrLogicRequestHandler {
     * @purpose=> This method will construct the JSON Indivvidual objects
     * @created date=> 
     ================================================*/
-    public static  Map<String, List<Object>> getIndividualData( List<Contact> individuals, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> individualElementAndFieldAPI){
+    public static  Map<String, List<Map<String, String>>> getIndividualData( List<Contact> individuals, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> individualElementAndFieldAPI){
         // System.debug('Check 1 : '+individualElementAndFieldAPI);
-        Map<String, Object> individualObject = new Map<String, Object>();
-        Map<String, List<Object>> individualData = new Map<String, List<Object>>();
+        Map<String, String> individualObject = new Map<String, String>();
+        Map<String, List<Map<String, String>>> individualData = new Map<String, List<Map<String, String>>>();
         
         for(Contact ind : individuals){
             for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt ief : individualElementAndFieldAPI){
-                individualObject.put(ief.wlrcm__ElementName__c, ind.get(ief.wlrcm__FieldMappingAPI__c));
+                individualObject.put(ief.wlrcm__ElementName__c, String.valueOf(ind.get(ief.wlrcm__FieldMappingAPI__c)));
             } 
-            Map<String, Object> tmpObj = new Map<String, Object>();
+            Map<String, String> tmpObj = new Map<String, String>();
             tmpObj.putAll(individualObject);
             if(individualData.containsKey('Individuals')){
                 individualData.get('Individuals').add(tmpObj);
             }else{
-                individualData.put('Individuals', new List<Object>{tmpObj});
+                individualData.put('Individuals', new List<Map<String, String>>{tmpObj} );
             }
             individualObject.clear();
         }
