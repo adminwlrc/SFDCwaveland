@@ -7,40 +7,113 @@
  * @last modified by => 
  ================================================*/
 public with sharing class PayOrLogicRequestHandler {
-  
+
+    /* ================================================
+    * @Method Name => createJSONRequest
+    * @author => Admin
+    * @purpose=> This method construct JSON
+    * @created date=> 
+    ================================================*/
     public static String createJSONRequest(List<Id> contactIds){
-        String jsonRequest;
+        
         Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeElementAndFieldAPI = getNodeElementAndFieldAPI();
         List<Contact> individuals = getContacts(contactIds , nodeElementAndFieldAPI);
-        Map<String,Map<String, String>> productData = getProductData(nodeElementAndFieldAPI.get('productData'));
-        System.debug('Check 1 : '+productData);
-        Map<String, List<Map<String, String>>> individualData = getIndividualData(individuals, nodeElementAndFieldAPI.get('Individuals'));
-        System.debug('Check 2 : '+individualData);
-        Map<String, String> tmp = (Map<String, String>)individualData;
+        Map<String, Object> productObject = getProductObject(nodeElementAndFieldAPI.get('productData'));
+        List<Map<String, Object>> individualObjects = getIndividualObjects(individuals, nodeElementAndFieldAPI);
+        productObject.put('Individuals', individualObjects);
+        Map<String, Object> demographicObject = getDemographicObject(nodeElementAndFieldAPI.get('Demographic'));
+        productObject.put('Demographic', demographicObject);
+        Map<String, Object> insuranceFinderObject = getinsuranceFinderObject(nodeElementAndFieldAPI.get('InsuranceFinder'));
+        productObject.put('InsuranceFinder', insuranceFinderObject);
 
-        // Map<String, Object> guarantorData = getGuarantorData(individuals[0], nodeElementAndFieldAPI.get('Guarantor'));
-    //     Map<String, Object> demographicData = getDemographicData(nodeElementAndFieldAPI.get('Demographic'));
-    //     Map<String, Object> insuranceFinderData = getInsuranceFinderData(nodeElementAndFieldAPI.get('InsuranceFinder'));
+        return System.JSON.serializePretty(productObject);
+    }
+    /* ================================================
+    * @Method Name => getProductObject
+    * @author => Admin
+    * @purpose=> This method construct the productData node in the JSON request.  
+    * @created date=> 
+    ================================================*/
+    public static Map<String, Object> getProductObject(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeElementAndFieldAPI){
+        
+        Map<String, Object> productObject = new Map<String, Object>();
+        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt obj : nodeElementAndFieldAPI){
+            if(obj.wlrcm__ElementName__c ==  'RequestDate'){
+                productObject.put( obj.wlrcm__ElementName__c, Datetime.now().format('MM/dd/yyyy\' \'HH:mm:ss'));
+            }
+            if(obj.wlrcm__ElementName__c ==  'TransactionId'){
+                productObject.put(obj.wlrcm__ElementName__c, 'Put an Id here ');
+            }
+            if(obj.wlrcm__ElementName__c ==  'RequestingSoftware'){
+                productObject.put(obj.wlrcm__ElementName__c, obj.wlrcm__Value__c);
+            }
+        }
+        return productObject;
+    }
+    /* ================================================
+    * @Method Name => getIndividualObjects
+    * @author => Admin
+    * @purpose=> This method will construct the JSON Indivvidual objects
+    * @created date=> 
+    ================================================*/
+    public static  List<Map<String, Object>> getIndividualObjects( List<Contact> individuals, Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeElementAndFieldAPI){
+        
+        Map<String, Object> individualObject = new Map<String, Object>();
+        List<Map<String, Object>> individualObjects = new List<Map<String, Object>>();
+        for(Contact ind : individuals){
+            for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt ief : nodeElementAndFieldAPI.get('Individuals')){
+                individualObject.put(ief.wlrcm__ElementName__c, String.valueOf(ind.get(ief.wlrcm__FieldMappingAPI__c)));
+            } 
+            individualObject.put('Guarantor', getGuarantorObject(ind, nodeElementAndFieldAPI.get('Guarantor')));
+            individualObjects.add(individualObject);
+        }
+        
+        return individualObjects;
+    } 
+    /* ================================================
+    * @Method Name => getGuarantorObject
+    * @author => Admin
+    * @purpose=> This method construct the Eligibilities node in the JSON request.  
+    * @created date=> 
+    ================================================*/
+    public static Map<String,Object> getGuarantorObject(Contact individual, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> guarantorElementAndFieldAPI){
 
-    //     String productDatajsonRequest= JSON.serializePretty(productData);
-    //     String individualDatajsonRequest = JSON.serializePretty(individualData);
-    //     String guarantorDatajsonRequest = JSON.serializePretty(guarantorData);
-    //     String demographicDatajsonRequest= JSON.serializePretty(demographicData);
-    //     String insuranceFinderDatajsonRequest= JSON.serializePretty(insuranceFinderData);
-    //     productDatajsonRequest = productDatajsonRequest.trim();
-    //     individualDatajsonRequest = individualDatajsonRequest.trim();
-    //     guarantorDatajsonRequest = guarantorDatajsonRequest.trim();
-    //     demographicDatajsonRequest = demographicDatajsonRequest.trim();
-    //     insuranceFinderDatajsonRequest = insuranceFinderDatajsonRequest.trim();
-    //     productDatajsonRequest = productDatajsonRequest.remove('}');
-    //     individualDatajsonRequest = individualDatajsonRequest.remove(']').remove('}').removeStart('{');
-    //     guarantorDatajsonRequest = guarantorDatajsonRequest.removeEnd('}').removeStart('{');
-    //     demographicDatajsonRequest = demographicDatajsonRequest.removeEnd('}').removeStart('{');
-    //     insuranceFinderDatajsonRequest = insuranceFinderDatajsonRequest.removeEnd('}').removeStart('{');
-    //    System.debug('Check productDatajsonRequest : '+ productDatajsonRequest);
-    //    jsonRequest = productDatajsonRequest + ','+individualDatajsonRequest+','+guarantorDatajsonRequest+ '}],'+demographicDatajsonRequest+','+insuranceFinderDatajsonRequest+'}}';
-    //     return jsonRequest.trim();
-    return null;
+        Map<String, Object> guarantorObject = new Map<String, Object>();
+        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt ief : guarantorElementAndFieldAPI){
+            guarantorObject.put(ief.wlrcm__ElementName__c, individual.get(ief.wlrcm__FieldMappingAPI__c));
+        } 
+        
+        return guarantorObject;
+    }
+    /* ================================================
+    * @Method Name => getDemographicObject
+    * @author => Admin
+    * @purpose=> This method construct the Demographic node in the JSON request.  
+    * @created date=> 
+    ================================================*/
+    public static Map<String, Object> getDemographicObject(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> demographicElementAndFieldAPI){
+    
+        Map<String, Object> demographicObject = new Map<String, Object>();
+        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : demographicElementAndFieldAPI){
+           demographicObject.put( pl.wlrcm__ElementName__c, pl.wlrcm__Value__c);
+        }
+
+        return demographicObject;
+    }
+    /* ================================================
+    * @Method Name => getInsuranceFinderObject
+    * @author => Admin
+    * @purpose=> This method construct the InsuranceFinder node in the JSON request.  
+    * @created date=> 
+    ================================================*/
+    public static Map<String, Object> getInsuranceFinderObject(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> insuranceFinderElementAndFieldAPI){
+        
+        Map<String, Object> insuranceFinderObject = new Map<String, Object>();
+        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : insuranceFinderElementAndFieldAPI){
+           insuranceFinderObject.put( pl.wlrcm__ElementName__c, pl.wlrcm__Value__c);
+        }
+
+        return insuranceFinderObject;
     }
     /* ================================================
     * @Method Name => getNodeElementAndFieldAPI
@@ -50,6 +123,7 @@ public with sharing class PayOrLogicRequestHandler {
     * @created date=> 
     ================================================*/
     public static Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> getNodeElementAndFieldAPI(){
+        
         Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeElementAndFieldAPI = new  Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>>();
         for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : [SELECT Id, wlrcm__ElementName__c, wlrcm__NodeName__c, wlrcm__FieldMappingAPI__c, wlrcm__Value__c
                                                                                                 FROM wlrcm__PayOrLogicJSONRequestFieldMapping__mdt
@@ -84,110 +158,8 @@ public with sharing class PayOrLogicRequestHandler {
         queryStr+=' FROM Contact';
         queryStr+=' WHERE Id IN : contactIds';
         queryStr+=' LIMIT 50000';
-        System.debug('Check queryStr : '+ queryStr);
         List<Contact> contacts = Database.query(queryStr);
         
         return contacts;
-    }
-    /* ================================================
-    * @Method Name => getproductData
-    * @author => Admin
-    * @purpose=> This method construct the productData node in the JSON request.  
-    * @created date=> 
-    ================================================*/
-    public static Map<String, Map<String, String>> getProductData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeElementAndFieldAPI){
-        
-        Map<String, String> tmp = new Map<String, String>();
-        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt obj : nodeElementAndFieldAPI){
-            if(obj.wlrcm__ElementName__c ==  'RequestDate'){
-                tmp.put( obj.wlrcm__ElementName__c, Datetime.now().format('MM/dd/yyyy\' \'HH:mm:ss'));
-            }
-            if(obj.wlrcm__ElementName__c ==  'TransactionId'){
-                tmp.put(obj.wlrcm__ElementName__c, 'Put an Id here ');
-            }
-            if(obj.wlrcm__ElementName__c ==  'RequestingSoftware'){
-                tmp.put(obj.wlrcm__ElementName__c, obj.wlrcm__Value__c);
-            }
-        }
-        Map<String, Map<String, String>> productData = new Map<String, Map<String, String>>{'productData' => tmp };
-        return productData;
-    }
-    /* ================================================
-    * @Method Name => individualData
-    * @author => Admin
-    * @purpose=> This method will construct the JSON Indivvidual objects
-    * @created date=> 
-    ================================================*/
-    public static  Map<String, List<Map<String, String>>> getIndividualData( List<Contact> individuals, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> individualElementAndFieldAPI){
-        // System.debug('Check 1 : '+individualElementAndFieldAPI);
-        Map<String, String> individualObject = new Map<String, String>();
-        Map<String, List<Map<String, String>>> individualData = new Map<String, List<Map<String, String>>>();
-        
-        for(Contact ind : individuals){
-            for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt ief : individualElementAndFieldAPI){
-                individualObject.put(ief.wlrcm__ElementName__c, String.valueOf(ind.get(ief.wlrcm__FieldMappingAPI__c)));
-            } 
-            Map<String, String> tmpObj = new Map<String, String>();
-            tmpObj.putAll(individualObject);
-            if(individualData.containsKey('Individuals')){
-                individualData.get('Individuals').add(tmpObj);
-            }else{
-                individualData.put('Individuals', new List<Map<String, String>>{tmpObj} );
-            }
-            individualObject.clear();
-        }
-        
-        return individualData;
-    } 
-    /* ================================================
-    * @Method Name => getGuarantorData
-    * @author => Admin
-    * @purpose=> This method construct the Eligibilities node in the JSON request.  
-    * @created date=> 
-    ================================================*/
-    public static Map<String, Map<String,Object>> getGuarantorData(Contact individual, List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> guarantorElementAndFieldAPI){
-
-        Map<String, Object> guarantorObject = new Map<String, Object>();
-        Map<String, Map<String,Object>> guarantorData = new Map<String, Map<String, Object>>();
-        
-     
-        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt ief : guarantorElementAndFieldAPI){
-            guarantorObject.put(ief.wlrcm__ElementName__c, individual.get(ief.wlrcm__FieldMappingAPI__c));
-        } 
-       
-        guarantorData.put('Guarantor' , guarantorObject);
-        
-        
-        return guarantorData;
-    }
-    /* ================================================
-    * @Method Name => getDemographicData
-    * @author => Admin
-    * @purpose=> This method construct the Demographic node in the JSON request.  
-    * @created date=> 
-    ================================================*/
-    public static Map<String, Object> getDemographicData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeElementAndFieldAPI){
-        Map<String, Map<String,Object>> demographicData = new Map<String, Map<String, Object>>();
-        Map<String, Object> demographicObject = new Map<String, Object>();
-        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : nodeElementAndFieldAPI){
-           demographicObject.put( pl.wlrcm__ElementName__c, pl.wlrcm__Value__c);
-        }
-            demographicData.put('Demographic', demographicObject);
-        return demographicData;
-    }
-    /* ================================================
-    * @Method Name => getInsuranceFinderData
-    * @author => Admin
-    * @purpose=> This method construct the InsuranceFinder node in the JSON request.  
-    * @created date=> 
-    ================================================*/
-    public static Map<String, Object> getInsuranceFinderData(List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt> nodeElementAndFieldAPI){
-        Map<String, Map<String,Object>> insuranceFinderData = new Map<String, Map<String, Object>>();
-        Map<String, Object> insuranceFinderObject = new Map<String, Object>();
-        for(wlrcm__PayOrLogicJSONRequestFieldMapping__mdt pl : nodeElementAndFieldAPI){
-           insuranceFinderObject.put( pl.wlrcm__ElementName__c, pl.wlrcm__Value__c);
-        }
-            insuranceFinderData.put('InsuranceFinder', insuranceFinderObject);
-        return insuranceFinderData;
     }
 }
