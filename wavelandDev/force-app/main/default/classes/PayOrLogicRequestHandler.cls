@@ -7,17 +7,21 @@
  * @last modified by => 
  ================================================*/
 public with sharing class PayOrLogicRequestHandler {
+
+    public static Boolean SYSTEMDEBUG = false;
     /* ================================================
     * @Method Name => createJSONRequest
     * @author => Admin
     * @purpose=> This method construct JSON
     * @created date=> 
     ================================================*/
-    public static String createJSONRequest(List<Id> contactIds){
+    public static Map<String, String> createJSONRequest(List<Id> contactIds){
+        
         Map<String,List<wlrcm__PayOrLogicJSONRequestFieldMapping__mdt>> nodeElementAndFieldAPI = getNodeElementAndFieldAPI();
         List<Contact> individuals = getContacts(contactIds , nodeElementAndFieldAPI);
         Map<String, Object> jsonObject = new Map<String, Object>();
-        Map<String, Object> productObject = getProductObject(nodeElementAndFieldAPI.get(PayOrLogicConstants.PRODUCTDATA), createTransactionTracker(contactIds));
+        Id transactionId = createTransactionTracker(contactIds);
+        Map<String, Object> productObject = getProductObject(nodeElementAndFieldAPI.get(PayOrLogicConstants.PRODUCTDATA), transactionId);
         List<Map<String, Object>> individualObjects = getIndividualObjects(individuals, nodeElementAndFieldAPI);
         productObject.put(PayOrLogicConstants.INDIVIDUALS, individualObjects);
         Map<String, Object> demographicObject = getDemographicObject(nodeElementAndFieldAPI.get(PayOrLogicConstants.DEMOGRAPHIC));
@@ -25,7 +29,12 @@ public with sharing class PayOrLogicRequestHandler {
         Map<String, Object> insuranceFinderObject = getinsuranceFinderObject(nodeElementAndFieldAPI.get(PayOrLogicConstants.INSURANCEFINDER));
         productObject.put(PayOrLogicConstants.INSURANCEFINDER, insuranceFinderObject);
         jsonObject.put(PayOrLogicConstants.PRODUCTDATA, productObject);
-        return System.JSON.serializePretty(jsonObject);
+        if(SYSTEMDEBUG){
+            System.debug('createJSONRequest : '+System.JSON.serializePretty(jsonObject));
+        }
+        Map<String, String> jsonRequest = new Map<String, String>{PayOrLogicConstants.JSONREQUEST => System.JSON.serializePretty(jsonObject), PayOrLogicConstants.TRANSACTIONID =>transactionId};
+        
+        return jsonRequest;
     }
     /* ================================================
     * @Method Name => getProductObject

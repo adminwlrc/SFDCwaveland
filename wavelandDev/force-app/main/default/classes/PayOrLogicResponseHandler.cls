@@ -86,7 +86,7 @@ public with sharing class PayOrLogicResponseHandler {
         }
         insert payOrLogicRecs;
 
-        PayOrLogicHttpRequest.updateTransactionRecord(responseObj, PayOrLogicConstants.COMPLETED);
+        PayOrLogicHttpRequest.updateTransactionRecord(responseObj, PayOrLogicConstants.COMPLETED, (Id)responseObj.get(PayOrLogicConstants.TRANSACTIONID));
     }
     /* ================================================
     * @Method Name => getScopeContacts

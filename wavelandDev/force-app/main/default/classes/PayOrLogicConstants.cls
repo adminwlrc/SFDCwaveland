@@ -24,6 +24,7 @@ public with sharing class PayOrLogicConstants {
     public static final String REQUIRED = 'Required';
     public static final String USEREXCEPTIONMESSAGE = 'UserExceptionMessage';
     public static final String DATEFORMAT = 'MM/dd/yyyy\' \'HH:mm:ss';
+    public static final String JSONREQUEST = 'jsonRequest';
     
     
 }

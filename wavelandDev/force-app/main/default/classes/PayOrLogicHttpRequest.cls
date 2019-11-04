@@ -7,6 +7,7 @@
  * @last modified by => 
  ================================================*/
 public with sharing class PayOrLogicHttpRequest {
+    public static Boolean SYSTEMDEBUG = false;
     /* ================================================
     * @Method Name => main
     * @author => Admin
@@ -15,8 +16,13 @@ public with sharing class PayOrLogicHttpRequest {
     ================================================*/
     public static void main(List<Id> contactIds){
 
-        String jsonRequest = PayOrLogicRequestHandler.createJSONRequest(contactIds);
-        doHttpRequest(jsonRequest);
+        if(SYSTEMDEBUG){
+            PayOrLogicRequestHandler.SYSTEMDEBUG = true;
+            doHttpRequest(PayOrLogicRequestHandler.createJSONRequest(contactIds), true);
+        }else{
+            doHttpRequest(PayOrLogicRequestHandler.createJSONRequest(contactIds), false);
+        }
+        
     }
     /* ================================================
     * @Method Name => doHttpRequest
@@ -25,22 +31,28 @@ public with sharing class PayOrLogicHttpRequest {
     * @created date=> 
     ================================================*/
     @future(callout=true)
-    public static void doHttpRequest(String jsonRequest){
+    public static void doHttpRequest(Map<String, String> jsonRequest, Boolean systemDebug){
         wlrcm__HttpRequestSetting__mdt httpSetting = getHttpRequestSettings();
         HttpRequest req = new HttpRequest();
         req.setEndpoint(httpSetting.wlrcm__SetEndpoint__c);
         req.setMethod(httpSetting.wlrcm__SetMethod__c);
         req.setHeader(httpSetting.wlrcm__HeaderKey1__c, httpSetting.wlrcm__HeaderValue1__c);
         req.setHeader(httpSetting.wlrcm__HeaderKey2__c, httpSetting.wlrcm__HeaderValue2__c);
-        req.setBody(jsonRequest);
+        req.setBody(jsonRequest.get(PayOrLogicConstants.JSONREQUEST));
         Http http = new Http();
         HTTPResponse res;
         try{
             res = http.send(req);
-            responseHandler(res);
+            if(systemDebug){
+                responseHandler(res, true);
+            }else{
+                responseHandler(res, false);
+            }
         }catch(Exception e){
-            System.debug('There is a problem while doing http request : '+ e.getMessage() + ' StackString : '+e.getStackTraceString());
-            updateTransactionRecord((Map<String, Object>)System.JSON.deserializeUntyped(jsonRequest),PayOrLogicConstants.FAILED);
+            if(systemDebug){
+                System.debug('There is a problem while doing http request : '+ e.getMessage() + ' Line Number : '+e.getLineNumber());
+            }
+            updateTransactionRecord((Map<String, Object>)System.JSON.deserializeUntyped(res.getBody()),PayOrLogicConstants.FAILED, jsonRequest.get(PayOrLogicConstants.TRANSACTIONID));
         }
     }
     /* ================================================
@@ -49,19 +61,24 @@ public with sharing class PayOrLogicHttpRequest {
     * @purpose=> This method 
     * @created date=> 
     ================================================*/
-    public static  void  responseHandler(HTTPResponse res){
-        
+    public static  void  responseHandler(HTTPResponse res, Boolean systemDebug){
+        System.debug('Check responseHandler : '+ systemDebug);
         Map<String, Object> responseObj;
         if(res.getStatusCode() == 200){
+            if(systemDebug){
+                System.debug('System send this response : '+ res.getBody());
+            }
             responseObj = (Map<String, Object>)System.JSON.deserializeUntyped(res.getBody());
             if(!responseObj.containsKey(PayOrLogicConstants.USEREXCEPTIONMESSAGE)){
                 PayOrLogicResponseHandler.handleResponse(responseObj);
             }else{
-                //TODO : httpRequestErrorHandler(responseObj); 
-                System.debug('System response with Exception Message : '+responseObj.get(PayOrLogicConstants.USEREXCEPTIONMESSAGE));
+                throw new CustomException('System responded with Exception Message : '+responseObj.get(PayOrLogicConstants.USEREXCEPTIONMESSAGE));
             }
         }else{
+            if(SYSTEMDEBUG){
                System.debug('System response with bad Status Code: '+res.getStatusCode() + ' : '+res.getBody());
+            }
+               throw new CustomException('System responded with bad Status Code  : '+res.getStatusCode());
         }
     }
     /* ================================================
@@ -80,16 +97,19 @@ public with sharing class PayOrLogicHttpRequest {
         return httpSetting;
     }
     /* ================================================
-    * @Method Name => updateTransactionRecord
+    * @Method Name => updateTransactionRecord 
     * @author => Admin
     * @purpose=> This method 
     * @created date=> 
     ================================================*/
-    public static  void updateTransactionRecord(Map<String, Object> responseObj, String status){
+    public static  void updateTransactionRecord(Map<String, Object> responseObj, String status, Id transactionId){
         
         wlrcm__TransactionTracker__c transactionRecord = new wlrcm__TransactionTracker__c();
         transactionRecord.wlrcm__Status__c = status;
-        transactionRecord.Id = (Id)responseObj.get(PayOrLogicConstants.TRANSACTIONID);
+        transactionRecord.Id = transactionId;
+        if(responseObj.containsKey(PayOrLogicConstants.USEREXCEPTIONMESSAGE)){
+            transactionRecord.wlrcm__UserExceptionMessage__c = (String)responseObj.get(PayOrLogicConstants.USEREXCEPTIONMESSAGE);
+        }
         update transactionRecord;
     }
 }
