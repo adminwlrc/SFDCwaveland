@@ -10,18 +10,21 @@ public with sharing class PayOrLogicHttpRequest {
     /* ================================================
     * @Method Name => main
     * @author => Admin
-    * @purpose=> This method construct JSON
+    * @purpose=> This method 
     * @created date=> 
     ================================================*/
     public static void main(List<Id> contactIds){
+
         String jsonRequest = PayOrLogicRequestHandler.createJSONRequest(contactIds);
+        doHttpRequest(jsonRequest);
     }
     /* ================================================
     * @Method Name => doHttpRequest
     * @author => Admin
-    * @purpose=> This method construct JSON
+    * @purpose=> This method 
     * @created date=> 
     ================================================*/
+    @future(callout=true)
     public static void doHttpRequest(String jsonRequest){
         wlrcm__HttpRequestSetting__mdt httpSetting = getHttpRequestSettings();
         HttpRequest req = new HttpRequest();
@@ -32,94 +35,61 @@ public with sharing class PayOrLogicHttpRequest {
         req.setBody(jsonRequest);
         Http http = new Http();
         HTTPResponse res;
-        Map<String, Object> responseObj;
         try{
             res = http.send(req);
-            if(res.getStatusCode() == 200){
-                responseObj = (Map<String, Object>)System.JSON.deserializeUntyped(res.getBody());
-                if(!responseObj.containsKey('UserExceptionMessage')){
-                    PayOrLogicResponseHandler.handleResponse(responseObj);
-                }else{
-                    httpRequestErrorHandler(responseObj);
-                    System.debug('There is an error with the request : '+responseObj.get('UserExceptionMessage'));
-                }
-            }else{
-                // TODO
-            }
+            responseHandler(res);
         }catch(Exception e){
-            // TODO
+            System.debug('There is a problem while doing http request : '+ e.getMessage() + ' StackString : '+e.getStackTraceString());
+            updateTransactionRecord((Map<String, Object>)System.JSON.deserializeUntyped(jsonRequest),PayOrLogicConstants.FAILED);
+        }
+    }
+    /* ================================================
+    * @Method Name => responseHandler
+    * @author => Admin
+    * @purpose=> This method 
+    * @created date=> 
+    ================================================*/
+    public static  void  responseHandler(HTTPResponse res){
+        
+        Map<String, Object> responseObj;
+        if(res.getStatusCode() == 200){
+            responseObj = (Map<String, Object>)System.JSON.deserializeUntyped(res.getBody());
+            if(!responseObj.containsKey(PayOrLogicConstants.USEREXCEPTIONMESSAGE)){
+                PayOrLogicResponseHandler.handleResponse(responseObj);
+            }else{
+                //TODO : httpRequestErrorHandler(responseObj); 
+                System.debug('System response with Exception Message : '+responseObj.get(PayOrLogicConstants.USEREXCEPTIONMESSAGE));
+            }
+        }else{
+               System.debug('System response with bad Status Code: '+res.getStatusCode() + ' : '+res.getBody());
         }
     }
     /* ================================================
     * @Method Name => getHttpRequestSettings
     * @author => Admin
-    * @purpose=> This method construct JSON
+    * @purpose=> This method
     * @created date=> 
     ================================================*/
     public static  wlrcm__HttpRequestSetting__mdt getHttpRequestSettings(){
+        
         wlrcm__HttpRequestSetting__mdt httpSetting = [SELECT Id, wlrcm__HeaderKey1__c, wlrcm__HeaderKey2__c, wlrcm__HeaderValue1__c, wlrcm__HeaderValue2__c,
                                                                                 wlrcm__SetEndpoint__c, wlrcm__SetMethod__c
                                                                                 FROM wlrcm__HttpRequestSetting__mdt 
-                                                                                WHERE ServiceName__c = 'PayOrLogic'
+                                                                                WHERE ServiceName__c = : PayOrLogicConstants.PAYORLOGIC
                                                                                 LIMIT 1];
         return httpSetting;
     }
     /* ================================================
-    * @Method Name => doHttpRequest
+    * @Method Name => updateTransactionRecord
     * @author => Admin
-    * @purpose=> This method construct JSON
+    * @purpose=> This method 
     * @created date=> 
     ================================================*/
-    public static  void httpRequestErrorHandler(Map<String, Object> responseObj){
-
-
+    public static  void updateTransactionRecord(Map<String, Object> responseObj, String status){
+        
+        wlrcm__TransactionTracker__c transactionRecord = new wlrcm__TransactionTracker__c();
+        transactionRecord.wlrcm__Status__c = status;
+        transactionRecord.Id = (Id)responseObj.get(PayOrLogicConstants.TRANSACTIONID);
+        update transactionRecord;
     }
-    //{ExceptionType=Fatal, UserExceptionMessage=A request with the supplied transactionId of :ABC123347 has already been completed for this company.}
-    public static String json = '{ '+
-		'   \"productData\":{ '+
-		'      \"TransactionId\":\"ABC1233470\",'+
-		'      \"RequestingSoftware\":\"PL Portal\",'+
-		'      \"RequestDate\":\"3/30/2015 12:20:20\",'+
-		'      \"Individuals\":[ '+
-		'         { '+
-		'            \"Firstname\":\"Shelly\",'+
-		'            \"Lastname\":\"longs\",'+
-		'            \"Gender\":\"F\",'+
-		'            \"DOB\":\"1/1/1980\",'+
-		'            \"SSN\":\"333333333\",'+
-		'            \"Address1\":\"8566 E Cheers Av\",'+
-		'            \"City\":\"Fantasy Island\",'+
-		'            \"State\":\"IL\",'+
-		'            \"Zip\":\"60750\",'+
-		'            \"VisitNumber\":\"BW1I014116000936\",'+
-		'            \"MRN\":\"1246293\",'+
-		'            \"SubscriberId\":\"2848392ML\",'+
-		'            \"ClientId\":\"ABC123\",'+
-		'            \"PracticeLocation\":\"OH\",'+
-		'            \"ServiceBeginDate\":\"6/1/2014\",'+
-		'            \"ServiceEndDate\":\"6/1/2014\",'+
-		'            \"PatientProcessType\":\"Emergency\",'+
-		'            \"TotalCharges\":\"1394.00\",'+
-		'            \"Guarantor\":{ '+
-		'               \"Firstname\":\"Bill\",'+
-		'               \"Lastname\":\"Aalevelg\",'+
-		'               \"Gender\":\"M\",'+
-		'               \"DOB\":\"2/4/1980\",'+
-		'               \"Address1\":\"8566 E Cheers Av\",'+
-		'               \"City\":\"Fantasy Island\",'+
-		'               \"State\":\"IL\",'+
-		'               \"Zip\":\"60750\",'+
-		'               \"Employer\":\"ABC Company\"'+
-		'            }'+
-		'         }'+
-		'      ],'+
-		'      \"Demographic\":{ '+
-		'         \"IncludeCredit\":\"No\"'+
-		'      },'+
-		'      \"InsuranceFinder\":{ '+
-		'         \"CallbackURL\":\"None\"'+
-		'      }'+
-		'   }'+
-		'}';
-
 }
