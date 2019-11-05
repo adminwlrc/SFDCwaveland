@@ -1,12 +1,12 @@
-/* ================================================
- * @Class Name => PayOrLogicRequestHandler
+  /* ================================================
+ * @Class Name => PayOrLogicCreateJsonRequest
  * @author => Admin
  * @purpose=> 
  * @created date=> 
  * @last modified date=> 
  * @last modified by => 
  ================================================*/
-public with sharing class PayOrLogicRequestHandler {
+public with sharing class PayOrLogicCreateJsonRequest {
 
     public static Boolean SYSTEMDEBUG = false;
     /* ================================================
@@ -213,3 +213,4 @@ public with sharing class PayOrLogicRequestHandler {
         return createPayOrLogicRecords;
     }
 }
+
