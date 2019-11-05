@@ -63,10 +63,11 @@ public with sharing class PayOrLogicHttpRequest {
     ================================================*/
     public static  void  responseHandler(HTTPResponse res, Boolean systemDebug){
         System.debug('Check responseHandler : '+ systemDebug);
-        Map<String, Object> responseObj;
+        Map<String, Object> responseObj;  
         if(res.getStatusCode() == 200){
             if(systemDebug){
                 System.debug('System send this response : '+ res.getBody());
+                // sendEmail.sendDebugEmail('cgarces@wavelandrcm.com', 'Salesforce Support', 'JSON RESPONSE', res.getBody());
             }
             responseObj = (Map<String, Object>)System.JSON.deserializeUntyped(res.getBody());
             if(!responseObj.containsKey(PayOrLogicConstants.USEREXCEPTIONMESSAGE)){
@@ -78,7 +79,7 @@ public with sharing class PayOrLogicHttpRequest {
             if(SYSTEMDEBUG){
                System.debug('System response with bad Status Code: '+res.getStatusCode() + ' : '+res.getBody());
             }
-               throw new CustomException('System responded with bad Status Code  : '+res.getStatusCode());
+            throw new CustomException('System responded with bad Status Code  : '+res.getStatusCode());
         }
     }
     /* ================================================

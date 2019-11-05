@@ -74,7 +74,7 @@ public with sharing class PayOrLogicResponseHandler {
     * @created date=> 
     ================================================*/
     public static  void  createPayOrLogicRecords(List<wlrcm__PayOrLogic__c> payOrLogicRecords, Set<String> visitNumbers, Map<String, Object> responseObj){
-        
+
         List<wlrcm__PayOrLogic__c>payOrLogicRecs = new List<wlrcm__PayOrLogic__c>();
         Map<String, Id> scopeContacts = new Map<String, Id>();
         for(Contact c : [SELECT Id, wlrcm__VisitNumber__c FROM Contact WHERE wlrcm__VisitNumber__c IN : visitNumbers]){
@@ -85,7 +85,6 @@ public with sharing class PayOrLogicResponseHandler {
             payOrLogicRecs.add(pol);
         }
         insert payOrLogicRecs;
-
         PayOrLogicHttpRequest.updateTransactionRecord(responseObj, PayOrLogicConstants.COMPLETED, (Id)responseObj.get(PayOrLogicConstants.TRANSACTIONID));
     }
     /* ================================================
