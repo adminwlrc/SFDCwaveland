@@ -52,9 +52,9 @@ public with sharing class PayOrLogicHttpRequest {
             if(systemDebug){
                 System.debug('There is a problem while doing http request : '+ e.getMessage() + ' Line Number : '+e.getLineNumber());
             }
-            updateTransactionRecord((Map<String, Object>)System.JSON.deserializeUntyped(res.getBody()),PayOrLogicConstants.FAILED, jsonRequest.get(PayOrLogicConstants.TRANSACTIONID));
+            updateTransactionRecord(null,PayOrLogicConstants.FAILED, jsonRequest.get(PayOrLogicConstants.TRANSACTIONID));
         }
-    }
+    } 
     /* ================================================
     * @Method Name => responseHandler
     * @author => Admin
@@ -62,8 +62,9 @@ public with sharing class PayOrLogicHttpRequest {
     * @created date=> 
     ================================================*/
     public static  void  responseHandler(HTTPResponse res, Boolean systemDebug){
-        System.debug('Check responseHandler : '+ systemDebug);
+
         Map<String, Object> responseObj;  
+        System.debug('System send this Http response : '+ res.getBody());
         if(res.getStatusCode() == 200){
             if(systemDebug){
                 System.debug('System send this response : '+ res.getBody());
@@ -76,7 +77,7 @@ public with sharing class PayOrLogicHttpRequest {
                 throw new CustomException('System responded with Exception Message : '+responseObj.get(PayOrLogicConstants.USEREXCEPTIONMESSAGE));
             }
         }else{
-            if(SYSTEMDEBUG){
+            if(systemDebug){
                System.debug('System response with bad Status Code: '+res.getStatusCode() + ' : '+res.getBody());
             }
             throw new CustomException('System responded with bad Status Code  : '+res.getStatusCode());
@@ -108,9 +109,12 @@ public with sharing class PayOrLogicHttpRequest {
         wlrcm__TransactionTracker__c transactionRecord = new wlrcm__TransactionTracker__c();
         transactionRecord.wlrcm__Status__c = status;
         transactionRecord.Id = transactionId;
-        if(responseObj.containsKey(PayOrLogicConstants.USEREXCEPTIONMESSAGE)){
-            transactionRecord.wlrcm__UserExceptionMessage__c = (String)responseObj.get(PayOrLogicConstants.USEREXCEPTIONMESSAGE);
+        if(responseObj != NULL){
+            if(responseObj.containsKey(PayOrLogicConstants.USEREXCEPTIONMESSAGE)){
+                transactionRecord.wlrcm__UserExceptionMessage__c = (String)responseObj.get(PayOrLogicConstants.USEREXCEPTIONMESSAGE);
+            }
         }
+        
         update transactionRecord;
     }
 }
