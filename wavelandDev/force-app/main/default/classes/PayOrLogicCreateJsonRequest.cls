@@ -190,27 +190,5 @@ public with sharing class PayOrLogicCreateJsonRequest {
 
         return transantion.Id;
     }
-    /* ================================================
-    * @Method Name => createPayOrLogicRecords
-    * @author => Admin
-    * @purpose=> This method will return a map with a contactId as a key and the payorlogic record to update with the service result
-    * @created date=> 
-    ================================================*/
-    public static Map<Id, Id> createPayOrLogicRecords(List<Id> contactIds){
-        
-        Map<Id, Id> createPayOrLogicRecords = new Map<Id, Id>();
-        List<wlrcm__PayOrLogic__c> payOrLogicRecords = new List<wlrcm__PayOrLogic__c>();
-        for(Id cId : contactIds) {
-            wlrcm__PayOrLogic__c tmp = new wlrcm__PayOrLogic__c();
-            tmp.wlrcm__Patient__c = cId;
-            payOrLogicRecords.add(tmp);
-        }
-        upsert payOrLogicRecords;
-
-        for(wlrcm__PayOrLogic__c pol : [SELECT Id, wlrcm__Patient__c FROM wlrcm__PayOrLogic__c WHERE wlrcm__Patient__c IN : contactIds]){
-            createPayOrLogicRecords.put(pol.wlrcm__Patient__c, pol.Id);
-        }
-        return createPayOrLogicRecords;
-    }
 }
 

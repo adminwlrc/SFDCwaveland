@@ -3,7 +3,7 @@ private with sharing class PayOrLogicRequestHandlerTest {
     private static Contact createContacts(){
         
         Contact c = new Contact();
-        Map<String, String> fieldMap = new Map<String, String>{'FirstName'=>'Shelly', 'LastName'=>'Test', 'wlrcm__VisitNumber__c' => '012345'};
+        Map<String, String> fieldMap = new Map<String, String>{'FirstName'=>'Shelly', 'LastName'=>'Test', 'wlrcm__VisitNumber__c' => 'BW1I014116000936'};
         Contact createContact = (Contact)TestFactory.createObject('Contact', fieldMap);
         System.debug('Check createContacts : '+createContact);
         return createContact;
@@ -20,7 +20,7 @@ private with sharing class PayOrLogicRequestHandlerTest {
         Test.starttest();
             PayOrLogicHttpRequest.main(new List<Id>{individual[0].Id});
         Test.stoptest();
-        System.assert([SELECT Id, wlrcm__VisitNumber__c FROM wlrcm__PayOrLogic__c WHERE wlrcm__VisitNumber__c = '012345'] != NULL);
+        System.assert([SELECT Id, wlrcm__VisitNumber__c FROM wlrcm__PayOrLogic__c WHERE wlrcm__VisitNumber__c = 'BW1I014116000936' AND wlrcm__Patient__c = : individual[0].Id] != NULL);
 
     }
     @isTest static  void testNegativeResponse() {
@@ -85,7 +85,7 @@ private with sharing class PayOrLogicRequestHandlerTest {
                 System.assertEquals('This field is required in the Patient record : wlrcm__VisitNumber__c',e.getMessage());
             }
         Test.stoptest();
-        System.assert([SELECT Id, wlrcm__VisitNumber__c FROM wlrcm__PayOrLogic__c WHERE wlrcm__VisitNumber__c = '012345'] != NULL);
+        System.assert([SELECT Id, wlrcm__VisitNumber__c FROM wlrcm__PayOrLogic__c WHERE wlrcm__VisitNumber__c = 'BW1I014116000936'] != NULL);
 
     }
 }
