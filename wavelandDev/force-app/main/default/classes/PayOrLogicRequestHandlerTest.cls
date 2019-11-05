@@ -86,6 +86,5 @@ private with sharing class PayOrLogicRequestHandlerTest {
             }
         Test.stoptest();
         System.assert([SELECT Id, wlrcm__VisitNumber__c FROM wlrcm__PayOrLogic__c WHERE wlrcm__VisitNumber__c = 'BW1I014116000936'] != NULL);
-
     }
 }

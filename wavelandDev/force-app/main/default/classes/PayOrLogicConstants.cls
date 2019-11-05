@@ -6,7 +6,7 @@
  * @last modified date=> 
  * @last modified by => 
  ================================================*/
-public with sharing class PayOrLogicConstants {
+public class PayOrLogicConstants {
     public static final String GUARANTOR = 'Guarantor';
     public static final String INDIVIDUALS = 'Individuals';
     public static final String INSURANCEFINDER = 'InsuranceFinder';
@@ -25,6 +25,4 @@ public with sharing class PayOrLogicConstants {
     public static final String USEREXCEPTIONMESSAGE = 'UserExceptionMessage';
     public static final String DATEFORMAT = 'MM/dd/yyyy\' \'HH:mm:ss';
     public static final String JSONREQUEST = 'jsonRequest';
-    
-    
 }
