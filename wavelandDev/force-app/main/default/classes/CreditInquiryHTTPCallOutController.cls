@@ -1,20 +1,23 @@
-/**
-* @Description: This class will execute the HttpRequest to Equifax
-* @author: Admin
-* @version: 1.0
-* @since: 08/25/2019
-*/
+/* ================================================
+ * @Class Name => CreditInquirySegmentHandler
+ * @author => Admin
+ * @purpose=> This class will execute the HttpRequest to Equifax
+ * @created date=> 
+ * @last modified date=> 
+ * @last modified by => 
+ ================================================*/
 public with sharing class CreditInquiryHTTPCallOutController {
 
     public static Boolean SYSTEMDEBUG = false;
     private final static String SPACE = ' ';
     private final static String PLUS = '+';
     private final static String CERR = 'CERR';
-    /**
-    * @Description: Main
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getRequest
+    * @author => Admin
+    * @purpose=>
+    * @created date=> 
+    ================================================*/
     public static void getRequest(String serviceName, Id contactId){
         String inquiry = CreditInquirySegmentBuilder.buildInquiry(serviceName, contactId);
         String dial = CreditInquiryDialSegmentBuilder.buildDIAL(serviceName);
@@ -30,12 +33,13 @@ public with sharing class CreditInquiryHTTPCallOutController {
            updateDemographicRecord(resultValueMap, contactId,serviceName);
         }
     }
-    /**
-    * @Description: This method will return the map with the API names as the Key and their respective values
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
-    public static Map<String, String> getresultValueMap(HTTPResponse response, String serviceName){
+    /* ================================================
+    * @Method Name => getResultValueMap
+    * @author => Admin
+    * @purpose=> This method will return the map with the API names as the Key and their respective values
+    * @created date=> 
+    ================================================*/
+    public static Map<String, String> getResultValueMap(HTTPResponse response, String serviceName){
         
         Map<String, String> resultValueMap = new Map<String, String>();
         if(response.getStatusCode() == 200 && !response.getBody().contains(CERR)){
@@ -53,11 +57,12 @@ public with sharing class CreditInquiryHTTPCallOutController {
         }
         return resultValueMap;
     }
-    /**
-    * @Description: This method will execute the request and return the response object 
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => doHttpRequest
+    * @author => Admin
+    * @purpose=> This method will execute the request and return the response object 
+    * @created date=> 
+    ================================================*/
     public static HTTPResponse doHttpRequest(String request, wlrcm__HttpRequestSetting__mdt httpRequestSettings){
 
         request = request.replace(PLUS, SPACE); 
@@ -83,11 +88,12 @@ public with sharing class CreditInquiryHTTPCallOutController {
 
         return response;
     }
-    /**
-    * @Description: This method queries the setting for the http request fro the custom metadata
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getHttpRequestSetting
+    * @author => Admin
+    * @purpose=> This method queries the setting for the http request fro the custom metadata
+    * @created date=> 
+    ================================================*/
     public static wlrcm__HttpRequestSetting__mdt getHttpRequestSetting(String serviceName){
         wlrcm__HttpRequestSetting__mdt httpRequestSettings = [SELECT Id,Label,wlrcm__EncodingScheme__c,wlrcm__Environment__c,wlrcm__HeaderKey1__c,
                                                 wlrcm__HeaderValue1__c,wlrcm__ServiceName__c,wlrcm__SetEndpoint__c,wlrcm__SetMethod__c,wlrcm__SiteId__c,
@@ -98,13 +104,12 @@ public with sharing class CreditInquiryHTTPCallOutController {
         
         return httpRequestSettings;
     }
-    
-    
-    /**
-    * @Description: This method will update the contact record
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => updateDemographicRecord
+    * @author => Admin
+    * @purpose=> This method will update the contact record
+    * @created date=> 
+    ================================================*/
     public static void updateDemographicRecord(Map<String, String> resultValueMap, Id contactId, String serviceName){
         wlrcm__Equifax__c demographicRecord = new wlrcm__Equifax__c();
         try{
@@ -130,12 +135,12 @@ public with sharing class CreditInquiryHTTPCallOutController {
             throw new CustomException('There is an error while creating/updating the Demographic record :: ');
         }
     }
-    /**
-    * @Description: This method will check if there is already a demographic record for the Service Name
-    * @version: 1.0
-    * @since: 08/25/2019
-    *
-    **/
+    /* ================================================
+    * @Method Name => updateDemographicRecord
+    * @author => Admin
+    * @purpose=> This method will check if there is already a demographic record for the Service Name
+    * @created date=> 
+    ================================================*/
     public static wlrcm__Equifax__c checkDemographicRecordExist(Id contactId, String recordTypeId){
 
         try{

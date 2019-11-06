@@ -1,10 +1,11 @@
-/**
-* @Description: This method will build the inquiry resuest segment needed in the integration with Equifax,
-* 
-* @author: Admin
-* @version: 1.0
-* @since: 08/25/2019
-*/
+/* ================================================
+ * @Class Name => CreditInquirySegmentHandler
+ * @author => Admin
+ * @purpose=> This method will build the inquiry resuest segment needed in the integration with Equifax
+ * @created date=> 
+ * @last modified date=> 
+ * @last modified by => 
+ ================================================*/
 public with sharing class CreditInquirySegmentBuilder {
     // public final static String inquiry = 'DIAL496MZ00362@U22ISTS520P1B  P         IDNT                    496MZ00362@U2 I0P  666341002DAPHNE         E              AAPRICOT                   10021960                                                                                                     01AD2           COPPERHEAD                VWDECATUR             GA30035                   ';
     private final static String BLANK = 'BLANK';
@@ -13,11 +14,12 @@ public with sharing class CreditInquirySegmentBuilder {
     private final static String REQ = 'R';
     private final static String REQUIRED = 'Required';
     private final static String PLUS = '+';
-    /**
-    * @Description: Main, it will set test values from the wlrcm__Value__c field in the wlrcm__InquiryLayoutSegment__mdt
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getRecordCodeWithResultSegment
+    * @author => Admin
+    * @purpose=> Main, it will set test values from the wlrcm__Value__c field in the wlrcm__InquiryLayoutSegment__mdt
+    * @created date=> 
+    ================================================*/
     public static String buildInquiry(String serviceName, Id contactId){
         String buildInquiry='';
         Set<String> inquiryFormatSegmentDirectory = getInquiryFormatSegmentDirectory(serviceName);
@@ -32,12 +34,13 @@ public with sharing class CreditInquirySegmentBuilder {
         buildInquiry = segmentBuilder(attributeList);
         return buildInquiry;
     }
-     /**
-    * @Description: This method build list with all of the values from the custom metadata wlrcm__InquiryLayoutSegment__mdt. 
-    *               This method witll trim the value and padded if necessary
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getAttributeList
+    * @author => Admin
+    * @purpose=> This method build list with all of the values from the custom metadata wlrcm__InquiryLayoutSegment__mdt. 
+    *                     This method witll trim the value and padded if necessary
+    * @created date=> 
+    ================================================*/
     public static List<String> getAttributeList(Set<String> inquiryFormatSegmentDirectorySort, Map<String, List<wlrcm__InquiryLayoutSegment__mdt>> requestSegmentsMap){
         
         List<String> attributeList = new List<String>();
@@ -56,11 +59,12 @@ public with sharing class CreditInquirySegmentBuilder {
         }
         return attributeList;
     }
-    /**
-    * @Description: This method build a request string from a List<String>
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => segmentBuilder
+    * @author => Admin
+    * @purpose=> This method build a request string from a List<String>
+    * @created date=> 
+    ================================================*/
     public static String segmentBuilder(List<String> attributeList){
         String segmentBuilder ='';
         
@@ -70,12 +74,12 @@ public with sharing class CreditInquirySegmentBuilder {
        
         return segmentBuilder;
     }   
-    /**
-    * @Description: This method return a Set<String> containing the values to build the Contact Query
-    * @author: Admin
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getFieldMapping
+    * @author => Admin
+    * @purpose=> This method return a Set<String> containing the values to build the Contact Query
+    * @created date=> 
+    ================================================*/
     public static Set<String> getFieldMapping(List<wlrcm__InquiryLayoutSegment__mdt> inquiryLayoutSegment){
 
         Set<String> fieldAPI = new Set<String>();
@@ -87,12 +91,13 @@ public with sharing class CreditInquirySegmentBuilder {
         }
         return fieldAPI;
     }
-    /**
-    * @Description: This method build a dynamic contact query and return the contact record. 
+    /* ================================================
+    * @Method Name => getContactRecord
+    * @author => Admin
+    * @purpose=> This method build a dynamic contact query and return the contact record. 
     *               Query fields is based on the "Field Mapping" field in the custom metadata
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    * @created date=> 
+    ================================================*/
     public static Contact getContactRecord(Id contactId, Set<String> fieldAPI){
         String queryStr ='SELECT Id, ';
         for(String str : fieldAPI){
