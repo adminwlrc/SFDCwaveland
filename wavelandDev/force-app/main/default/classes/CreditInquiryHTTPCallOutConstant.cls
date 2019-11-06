@@ -9,5 +9,8 @@
 public with sharing class CreditInquiryHTTPCallOutConstant {
     public final static String SPACE = ' ';
     public final static String PLUS = '+';
+    public final static String DIAL = 'DIAL';
     public final static String CERR = 'CERR';
+    public final static String BLANK = 'BLANK'; 
+    public final static String RIGTH = 'R';   
 }

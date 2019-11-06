@@ -129,7 +129,7 @@ public with sharing class CreditInquirySegmentBuilder {
             }else {
                 if(rsp.wlrcm__FieldMapping__c != BLANK){
                     if(contactRecord.get(rsp.wlrcm__FieldMapping__c) == NULL && rsp.wlrcm__RequiredOptional__c == REQ){
-                        throw new CustomException('Contact record missing Inqury required fields : ');
+                        throw new CustomException('Contact record is missing Inqury required fields : '+rsp.wlrcm__FieldMapping__c);
                     }else{
                         rsp.wlrcm__Value__c = String.valueOf(contactRecord.get(rsp.wlrcm__FieldMapping__c));
                     }

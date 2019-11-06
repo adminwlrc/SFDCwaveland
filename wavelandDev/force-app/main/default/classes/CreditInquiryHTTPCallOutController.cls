@@ -9,9 +9,6 @@
 public with sharing class CreditInquiryHTTPCallOutController {
 
     public static Boolean SYSTEMDEBUG = false;
-    private final static String SPACE = ' ';
-    private final static String PLUS = '+';
-    private final static String CERR = 'CERR';
     /* ================================================
     * @Method Name => getRequest
     * @author => Admin
@@ -42,15 +39,15 @@ public with sharing class CreditInquiryHTTPCallOutController {
     public static Map<String, String> getResultValueMap(HTTPResponse response, String serviceName){
         
         Map<String, String> resultValueMap = new Map<String, String>();
-        if(response.getStatusCode() == 200 && !response.getBody().contains(CERR)){
+        if(response.getStatusCode() == 200 && !response.getBody().contains(CreditInquiryHTTPCallOutConstant.CERR)){
             CreditInquirySegmentHandler.SYSTEMDEBUG = SYSTEMDEBUG;
             resultValueMap = CreditInquirySegmentHandler.handleResult(response.getBody(), serviceName);
         }else{
             if(SYSTEMDEBUG){
                 System.debug('There is an error while handling reponse :::'+response.getBody());
-                System.debug('There is an error while handling reponse :::'+CreditInquiryHttpErrorHandler.handleError(cerr, serviceName));
+                System.debug('There is an error while handling reponse :::'+CreditInquiryHttpErrorHandler.handleError(CreditInquiryHTTPCallOutConstant.CERR, serviceName));
             }
-            throw new CustomException('There is an error while handling reponse :: '+CreditInquiryHttpErrorHandler.handleError(cerr, serviceName));
+            throw new CustomException('There is an error while handling reponse :: '+CreditInquiryHttpErrorHandler.handleError(CreditInquiryHTTPCallOutConstant.CERR, serviceName));
         }
         if(SYSTEMDEBUG){
             System.debug('resultValueMap : '+resultValueMap);
@@ -65,7 +62,7 @@ public with sharing class CreditInquiryHTTPCallOutController {
     ================================================*/
     public static HTTPResponse doHttpRequest(String request, wlrcm__HttpRequestSetting__mdt httpRequestSettings){
 
-        request = request.replace(PLUS, SPACE); 
+        request = request.replace(CreditInquiryHTTPCallOutConstant.PLUS, CreditInquiryHTTPCallOutConstant.SPACE); 
         HttpRequest req = new HttpRequest();
         req.setEndpoint(httpRequestSettings.wlrcm__SetEndpoint__c);
         req.setMethod(httpRequestSettings.wlrcm__SetMethod__c);

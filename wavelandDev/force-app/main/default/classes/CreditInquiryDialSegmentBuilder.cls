@@ -1,20 +1,16 @@
 /* ================================================
  * @Class Name => CreditInquiryDialSegmentBuilder
  * @author => Admin
- * @purpose=> This class will return the DIAL segment needed in the integration with Equifax
+ * @purpose=> This class will return the CreditInquiryHTTPCallOutConstant.CreditInquiryHTTPCallOutConstant.RIGTH segment needed in the integration with Equifax
  * @created date=> 
  * @last modified date=> 
  * @last modified by => 
  ================================================*/
 public with sharing class CreditInquiryDialSegmentBuilder {
-     private final static String DIAL = 'DIAL';
-    private final static String BLANK = 'BLANK';
-    private final static String SPACE = ' ';
-    private final static String RIGTH = 'R';  
     /* ================================================
     * @Method Name => buildDIAL
     * @author => Admin
-    * @purpose=> This method will build the DIAL segment needed in the integration with Equifax 
+    * @purpose=> This method will build the CreditInquiryHTTPCallOutConstant.CreditInquiryHTTPCallOutConstant.RIGTH segment needed in the integration with Equifax 
     * @created date=> 
     ================================================*/
     public static String buildDIAL(String serviceName){
@@ -23,7 +19,7 @@ public with sharing class CreditInquiryDialSegmentBuilder {
         List<wlrcm__InquiryDIALSegmentProcedure__mdt> inquiryDIALSegmentProcedure = getInquiryDIALSegmentProcedure(serviceName);
         List<String> dialSegementvalues = getInquiryDIALSegementValues(serviceName, inquiryDIALSegmentProcedure);
         System.debug('Check dialSegementvalues : '+ dialSegementvalues);
-        dialStr = DIAL;
+        dialStr = CreditInquiryHTTPCallOutConstant.CreditInquiryHTTPCallOutConstant.RIGTH;
         for(String str : dialSegementvalues){
             dialStr += str;
         }
@@ -57,7 +53,7 @@ public with sharing class CreditInquiryDialSegmentBuilder {
     /* ================================================
     * @Method Name => getInquiryDIALSegmentProcedure
     * @author => Admin
-    * @purpose=> Queries the DIAL segment elements
+    * @purpose=> Queries the CreditInquiryHTTPCallOutConstant.CreditInquiryHTTPCallOutConstant.RIGTH segment elements
     * @created date=> 
     ================================================*/
     public static List<wlrcm__InquiryDIALSegmentProcedure__mdt> getInquiryDIALSegmentProcedure(String serviceName){
@@ -79,7 +75,7 @@ public with sharing class CreditInquiryDialSegmentBuilder {
     * @created date=> 
     ================================================*/
     public static String addPadding(String value, Integer numberOfBytes, String align){
-        if(align == RIGTH){
+        if(align == CreditInquiryHTTPCallOutConstant.RIGTH){
            value = value.leftPad(numberOfBytes);
         }else{
            value = value.rightPad(numberOfBytes,'+');
