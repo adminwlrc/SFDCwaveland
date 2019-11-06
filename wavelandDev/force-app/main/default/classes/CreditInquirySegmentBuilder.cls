@@ -8,12 +8,7 @@
  ================================================*/
 public with sharing class CreditInquirySegmentBuilder {
     // public final static String inquiry = 'DIAL496MZ00362@U22ISTS520P1B  P         IDNT                    496MZ00362@U2 I0P  666341002DAPHNE         E              AAPRICOT                   10021960                                                                                                     01AD2           COPPERHEAD                VWDECATUR             GA30035                   ';
-    private final static String BLANK = 'BLANK';
-    private final static String SPACE = ' ';
-    private final static String RIGTH = 'R';
-    private final static String REQ = 'R';
-    private final static String REQUIRED = 'Required';
-    private final static String PLUS = '+';
+
     /* ================================================
     * @Method Name => getRecordCodeWithResultSegment
     * @author => Admin
@@ -46,8 +41,8 @@ public with sharing class CreditInquirySegmentBuilder {
         List<String> attributeList = new List<String>();
         for(String seg : inquiryFormatSegmentDirectorySort){
             for(wlrcm__InquiryLayoutSegment__mdt rsp : requestSegmentsMap.get(seg)){
-                if(rsp.wlrcm__Value__c == NULL || rsp.wlrcm__Value__c == BLANK){
-                    rsp.wlrcm__Value__c = PLUS;
+                if(rsp.wlrcm__Value__c == NULL || rsp.wlrcm__Value__c == CreditInquiryHTTPCallOutConstant.BLANK){
+                    rsp.wlrcm__Value__c = CreditInquiryHTTPCallOutConstant.PLUS;
                 }
                 rsp.wlrcm__Value__c.trim();
                 rsp.wlrcm__Value__c = rsp.wlrcm__Value__c.mid(0, Integer.valueOf(rsp.wlrcm__NumberOfBytes__c));
@@ -85,7 +80,7 @@ public with sharing class CreditInquirySegmentBuilder {
         Set<String> fieldAPI = new Set<String>();
 
         for(wlrcm__InquiryLayoutSegment__mdt rsp : inquiryLayoutSegment){
-            if(rsp.wlrcm__FieldMapping__c != BLANK){
+            if(rsp.wlrcm__FieldMapping__c != CreditInquiryHTTPCallOutConstant.BLANK){
                 fieldAPI.add(rsp.wlrcm__FieldMapping__c);
             }
         }
@@ -128,9 +123,9 @@ public with sharing class CreditInquirySegmentBuilder {
             if(rsp.wlrcm__Constant__c){
                 rsp.wlrcm__Value__c = rsp.wlrcm__Value__c;
             }else {
-                if(rsp.wlrcm__FieldMapping__c != BLANK){
-                    if(contactRecord.get(rsp.wlrcm__FieldMapping__c) == NULL && rsp.wlrcm__RequiredOptional__c == REQ){
-                        throw new CustomException('Contact record is missing Inqury required fields : '+rsp.wlrcm__FieldMapping__c);
+                if(rsp.wlrcm__FieldMapping__c != CreditInquiryHTTPCallOutConstant.BLANK){
+                    if(contactRecord.get(rsp.wlrcm__FieldMapping__c) == NULL && rsp.wlrcm__RequiredOptional__c == CreditInquiryHTTPCallOutConstant.REQ){
+                        throw new CustomException('Contact record is missing Inqury CreditInquiryHTTPCallOutConstant.REQUIRED fields : '+rsp.wlrcm__FieldMapping__c);
                     }else{
                         rsp.wlrcm__Value__c = String.valueOf(contactRecord.get(rsp.wlrcm__FieldMapping__c));
                     }
@@ -187,7 +182,7 @@ public with sharing class CreditInquirySegmentBuilder {
         for(wlrcm__InquiryFormatSegmentDirectory__mdt sd : [SELECT DeveloperName,Id,Label,Language,MasterLabel,NamespacePrefix,QualifiedApiName,wlrcm__Description__c,
                                                 wlrcm__MaximumOccurrences__c,wlrcm__SegmentIdentifier__c,wlrcm__SegmentLength__c,wlrcm__ServiceName__c,
                                                 wlrcm__Sort__c FROM wlrcm__InquiryFormatSegmentDirectory__mdt 
-                                                WHERE wlrcm__ServiceName__c =: serviceName AND wlrcm__RequiredOptional__c =: REQUIRED 
+                                                WHERE wlrcm__ServiceName__c =: serviceName AND wlrcm__RequiredOptional__c =: CreditInquiryHTTPCallOutConstant.REQUIRED 
                                                 ORDER BY wlrcm__Sort__c ASC NULLS LAST 
                                                 LIMIT 50000])
         {
@@ -220,10 +215,10 @@ public with sharing class CreditInquirySegmentBuilder {
     * @created date=> 
     ================================================*/
     public static String addPadding(String str, Integer numberOfBytes, String align){
-        if(align == RIGTH){ 
-            str = str.leftPad(numberOfBytes,PLUS); 
+        if(align == CreditInquiryHTTPCallOutConstant.RIGTH){ 
+            str = str.leftPad(numberOfBytes,CreditInquiryHTTPCallOutConstant.PLUS); 
         }else{
-           	str = str.rightPad(numberOfBytes,PLUS);
+           	str = str.rightPad(numberOfBytes,CreditInquiryHTTPCallOutConstant.PLUS);
         }
         return str;         
 	}  

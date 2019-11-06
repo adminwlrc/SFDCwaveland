@@ -10,7 +10,6 @@ public with sharing class CreditInquirySegmentHandler {
     
     // public final static String result = 'FULL                    496MZ003620011I0P  1012720160717201908292019AAPRICOT                 DAPHNE         E                66634100209021960           0010100000000010000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000N                         CA2         COPPERHEAD                VW                        DECATUR             GA30035    112016 T072019                               FA5072      QHSWXQH                   SO                        DECATUR             GA30034    012016 T122015                               ESPDQDJHU                            EXUJHU NLQJ                                                              SS  666341002            666341002                &&';
     public static Boolean SYSTEMDEBUG = false;
-    private final static String BLANK = 'BLANK';
     /* ================================================
     * @Method Name => handleResult
     * @author => Admin
@@ -19,7 +18,7 @@ public with sharing class CreditInquirySegmentHandler {
     ================================================*/
     public static  Map<String, String> handleResult(String result, String serviceName){
         if(SYSTEMDEBUG){
-            System.debug('Check result : '+result);
+            System.debug('Check handleResult entry : '+result);
         }
         Map<String, wlrcm__ResultFormatSegmentDirectory__mdt> resultFormatSegmentDirectory = getResultFormatSegmentDirectory(serviceName);
         Map<String, String> recordCodeWithResultSegment = getRecordCodeWithResultSegment(result, resultFormatSegmentDirectory);
@@ -35,12 +34,13 @@ public with sharing class CreditInquirySegmentHandler {
     * @created date=> 
     ================================================*/
     public static Map<String, String> getFieldMappingWithResultValue(Map<String, List<wlrcm__ResultLayoutSegment__mdt>> resultLayoutSegments, Map<String, String> recordCodeWithResultSegment){
+        
         Map<String, String> fieldMappingWithResultValue = new Map<String, String>();
         for(String str : recordCodeWithResultSegment.keySet()){
             for(wlrcm__ResultLayoutSegment__mdt rls : resultLayoutSegments.get(str)){
-                if(rls.wlrcm__FieldMapping__c != 'BLANK'){
+                if(rls.wlrcm__FieldMapping__c != CreditInquiryHTTPCallOutConstant.BLANK){
                     fieldMappingWithResultValue.put(String.valueOf(rls.wlrcm__FieldMapping__c),recordCodeWithResultSegment.get(str).mid(Integer.valueOf(rls.wlrcm__BytePosition__c),Integer.valueOf(rls.wlrcm__NumberOfBytes__c)));
-                    //System.debug('Check Description : '+ rls.wlrcm__FieldMapping__c + ' : '+ recordCodeWithResultSegment.get(str).mid(Integer.valueOf(rls.wlrcm__BytePosition__c),Integer.valueOf(rls.wlrcm__NumberOfBytes__c)));
+                   
                 }
             }
         }
@@ -79,6 +79,7 @@ public with sharing class CreditInquirySegmentHandler {
     * @created date=> 
     ================================================*/
     public static Map<String, String> getRecordCodeWithResultSegment(String result, Map<String, wlrcm__ResultFormatSegmentDirectory__mdt> resultFormatSegmentDirectory){
+        
         Map<String, String> recordCodeWithResponseSegment = new Map<String, String>();
         Integer segmentLenghtCounter = 0;
         for(String str : resultFormatSegmentDirectory.keySet()){

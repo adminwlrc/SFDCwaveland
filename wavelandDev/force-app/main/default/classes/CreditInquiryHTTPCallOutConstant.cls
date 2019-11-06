@@ -13,4 +13,6 @@ public with sharing class CreditInquiryHTTPCallOutConstant {
     public final static String CERR = 'CERR';
     public final static String BLANK = 'BLANK'; 
     public final static String RIGTH = 'R';   
+    public final static String REQ = 'R';
+    public final static String REQUIRED = 'REQUIRED';
 }
