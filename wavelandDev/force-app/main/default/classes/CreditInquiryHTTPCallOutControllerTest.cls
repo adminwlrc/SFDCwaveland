@@ -35,4 +35,54 @@ private with sharing class CreditInquiryHTTPCallOutControllerTest {
 
         
     }
+
+    @isTest static  void testNegativeResponse() {
+        StaticResourceCalloutMock mock = new StaticResourceCalloutMock();
+        mock.setStaticResource('CreditInquiryNegativeResponse');
+        mock.setStatusCode(200);
+        Test.setMock(HttpCalloutMock.class, mock);
+        List<Contact> individual = new List<Contact>{createContacts()};
+        insert individual;
+
+        Test.startTest();
+            CreditInquiryHTTPCallOutController.SYSTEMDEBUG = true;
+            try{
+                CreditInquiryHTTPCallOutController.getRequest('ID Report',individual[0].Id);
+            }catch(Exception e){
+                System.debug('Check failure '+e.getMessage());
+                System.assert(e.getMessage().contains('System responded with an Error'));
+            }
+            
+        Test.stopTest();
+    }
+    @isTest static  void testStatusCodeResponse() {
+        StaticResourceCalloutMock mock = new StaticResourceCalloutMock();
+        mock.setStaticResource('CreditInquiryNegativeResponse');
+        mock.setStatusCode(500);
+        Test.setMock(HttpCalloutMock.class, mock);
+        List<Contact> individual = new List<Contact>{createContacts()};
+        insert individual;
+
+        Test.starttest();
+            CreditInquiryHTTPCallOutController.SYSTEMDEBUG = true;
+             try{
+                CreditInquiryHTTPCallOutController.getRequest('ID Report',individual[0].Id);
+            }catch(Exception e){
+                System.assert(e.getMessage().contains('System responded with a unsuccesful Status Code'));
+            }
+        Test.stoptest();
+    }
+    @isTest static  void testSystemDownResponse() {
+        List<Contact> individual = new List<Contact>{createContacts()};
+        insert individual;
+
+        Test.starttest();
+            CreditInquiryHTTPCallOutController.SYSTEMDEBUG = true;
+             try{
+                CreditInquiryHTTPCallOutController.getRequest('ID Report',individual[0].Id);
+            }catch(Exception e){
+                System.assert(e.getMessage().contains('System is not avaialble at the moment'));
+            }
+        Test.stoptest();
+    }
 }

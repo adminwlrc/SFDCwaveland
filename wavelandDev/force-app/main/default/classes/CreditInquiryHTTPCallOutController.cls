@@ -25,7 +25,7 @@ public with sharing class CreditInquiryHTTPCallOutController {
           resultValueMap = getResultValueMap(doHttpRequest(dial+inquiry,httpRequestSettings),serviceName);
         }
         if(resultValueMap.size() > 0){
-           updateDemographicRecord(resultValueMap, contactId,serviceName);
+           updateEquifaxRecord(resultValueMap, contactId,serviceName);
         }
         if(SYSTEMDEBUG){ 
             System.debug('Check the inquiry :: '+dial+inquiry);
@@ -40,15 +40,23 @@ public with sharing class CreditInquiryHTTPCallOutController {
     public static Map<String, String> getResultValueMap(HTTPResponse response, String serviceName){
         
         Map<String, String> resultValueMap = new Map<String, String>();
-        if(response.getStatusCode() == 200 && !response.getBody().contains(CreditInquiryHTTPCallOutConstant.CERR)){
-            CreditInquirySegmentHandler.SYSTEMDEBUG = SYSTEMDEBUG;
-            resultValueMap = CreditInquirySegmentHandler.handleResult(response.getBody(), serviceName);
+        if(response.getStatusCode() == 200 ){
+            if(!response.getBody().contains(CreditInquiryHTTPCallOutConstant.CERR)){
+                CreditInquirySegmentHandler.SYSTEMDEBUG = SYSTEMDEBUG;
+                 resultValueMap = CreditInquirySegmentHandler.handleResult(response.getBody(), serviceName);
+            }else{
+                if(SYSTEMDEBUG){
+                    System.debug('System responded with an Error :::'+response.getBody());
+                    System.debug('System responded with an Error :::'+CreditInquiryHttpErrorHandler.handleError(CreditInquiryHTTPCallOutConstant.CERR, serviceName));
+                }
+                throw new CustomException('System responded with an Error ::: '+CreditInquiryHttpErrorHandler.handleError(CreditInquiryHTTPCallOutConstant.CERR, serviceName));
+            }
         }else{
             if(SYSTEMDEBUG){
-                System.debug('There is an error while handling reponse :::'+response.getBody());
-                System.debug('There is an error while handling reponse :::'+CreditInquiryHttpErrorHandler.handleError(CreditInquiryHTTPCallOutConstant.CERR, serviceName));
+                System.debug('System responded with a unsuccesful Status Code :::'+response.getBody());
+                System.debug('System responded with a unsuccesful Status Code :::'+CreditInquiryHttpErrorHandler.handleError(CreditInquiryHTTPCallOutConstant.CERR, serviceName));
             }
-            throw new CustomException('There is an error while handling reponse :: '+CreditInquiryHttpErrorHandler.handleError(CreditInquiryHTTPCallOutConstant.CERR, serviceName));
+            throw new CustomException('System responded with a unsuccesful Status Code ::: '+CreditInquiryHttpErrorHandler.handleError(CreditInquiryHTTPCallOutConstant.CERR, serviceName));
         }
         if(SYSTEMDEBUG){
             System.debug('resultValueMap : '+resultValueMap);
@@ -81,7 +89,7 @@ public with sharing class CreditInquiryHTTPCallOutController {
             response = http.send(req);
         }catch(Exception e){
             System.debug('Service is down :::'+e.getMessage());
-            throw new CustomException('External service is not working!!!');
+            throw new CustomException('System is not avaialble at the moment!!!');
         }
 
         return response;
@@ -103,51 +111,51 @@ public with sharing class CreditInquiryHTTPCallOutController {
         return httpRequestSettings;
     }
     /* ================================================
-    * @Method Name => updateDemographicRecord
+    * @Method Name => updateEquifaxRecord
     * @author => Admin
     * @purpose=> This method will update the contact record
     * @created date=> 
     ================================================*/
-    public static void updateDemographicRecord(Map<String, String> resultValueMap, Id contactId, String serviceName){
-        wlrcm__Equifax__c demographicRecord = new wlrcm__Equifax__c();
+    public static void updateEquifaxRecord(Map<String, String> resultValueMap, Id contactId, String serviceName){
+        wlrcm__Equifax__c equifaxRecord = new wlrcm__Equifax__c();
         try{
             Map<String,Id> recordTypeMap = GenericMethods.getRecordTypeMap('wlrcm__Equifax__c');
-            wlrcm__Equifax__c checkDemographicRecordExist = checkDemographicRecordExist(contactId,recordTypeMap.get(serviceName));
+            wlrcm__Equifax__c checkEquifaxRecordExist = checkEquifaxRecordExist(contactId,recordTypeMap.get(serviceName));
             
-            demographicRecord.wlrcm__RetrievedTime__c = System.now();
-            demographicRecord.RecordTypeId = recordTypeMap.get(serviceName); 
+            equifaxRecord.wlrcm__RetrievedTime__c = System.now();
+            equifaxRecord.RecordTypeId = recordTypeMap.get(serviceName); 
             for(String str : resultValueMap.keySet()){
-                demographicRecord.put(str, resultValueMap.get(str));
+                equifaxRecord.put(str, resultValueMap.get(str));
             }
-            if(checkDemographicRecordExist != NULL){
-                demographicRecord.Id = checkDemographicRecordExist.Id;
-                update demographicRecord;
-                System.debug('Demographic succefully updated!!!');
+            if(checkEquifaxRecordExist != NULL){
+                equifaxRecord.Id = checkEquifaxRecordExist.Id;
+                update equifaxRecord;
+                System.debug('Equifax succefully updated!!!');
             }else{
-                demographicRecord.wlrcm__Patient__c = contactId;
-                insert demographicRecord;
-                System.debug('Demographic succefully created!!!');
+                equifaxRecord.wlrcm__Patient__c = contactId;
+                insert equifaxRecord;
+                System.debug('Equifax succefully created!!!');
             }
         }catch(DmlException dmle){
-            System.debug('There is an error while executing update on Demographic : '+dmle.getDmlMessage(0));
-            throw new CustomException('There is an error while creating/updating the Demographic record :: ');
+            System.debug('There is an error while executing update on Equifax : '+dmle.getDmlMessage(0));
+            throw new CustomException('There is an error while creating/updating the Equifax record :: ');
         }
     }
     /* ================================================
-    * @Method Name => updateDemographicRecord
+    * @Method Name => updateEquifaxRecord
     * @author => Admin
-    * @purpose=> This method will check if there is already a demographic record for the Service Name
+    * @purpose=> This method will check if there is already a Equifax record for the Service Name
     * @created date=> 
     ================================================*/
-    public static wlrcm__Equifax__c checkDemographicRecordExist(Id contactId, String recordTypeId){
+    public static wlrcm__Equifax__c checkEquifaxRecordExist(Id contactId, String recordTypeId){
 
         try{
-            wlrcm__Equifax__c checkDemographicRecordExist = [SELECT Id 
-                                                                    FROM wlrcm__Equifax__c 
-                                                                    WHERE wlrcm__Patient__c =: contactId 
-                                                                    AND  RecordTypeId =: recordTypeId
-                                                                    LIMIT 1];
-            return checkDemographicRecordExist;
+            wlrcm__Equifax__c checkEquifaxRecordExist = [SELECT Id 
+                                                                                            FROM wlrcm__Equifax__c 
+                                                                                            WHERE wlrcm__Patient__c =: contactId 
+                                                                                            AND  RecordTypeId =: recordTypeId
+                                                                                            LIMIT 1];
+            return checkEquifaxRecordExist;
         }catch(QueryException qe){
 
         }
