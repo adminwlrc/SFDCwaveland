@@ -7,7 +7,7 @@
  * @last modified by => 
  ================================================*/
 public with sharing class CreditInquiryHTTPCallOutController {
-
+ 
     public static Boolean SYSTEMDEBUG = false;
     /* ================================================
     * @Method Name => getRequest
