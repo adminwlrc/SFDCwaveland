@@ -43,7 +43,7 @@ public class TestFactory {
         u.UserName=EMAIL;        
         database.insert(u);
         return u;
-    }
+    } 
 
     public static SObject createObject(String objName, Map<String, String> fieldMap){
         

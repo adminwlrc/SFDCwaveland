@@ -1,23 +1,24 @@
-/**
-* @Description: This method will handle the inquiry result (integration with Equifax)
-* 
-* @author: Admin
-* @version: 1.0
-* @since: 08/25/2019
-*/
+/* ================================================
+ * @Class Name => CreditInquirySegmentHandler
+ * @author => Admin
+ * @purpose=> 
+ * @created date=> 
+ * @last modified date=> 
+ * @last modified by => 
+ ================================================*/
 public with sharing class CreditInquirySegmentHandler { 
     
     // public final static String result = 'FULL                    496MZ003620011I0P  1012720160717201908292019AAPRICOT                 DAPHNE         E                66634100209021960           0010100000000010000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000N                         CA2         COPPERHEAD                VW                        DECATUR             GA30035    112016 T072019                               FA5072      QHSWXQH                   SO                        DECATUR             GA30034    012016 T122015                               ESPDQDJHU                            EXUJHU NLQJ                                                              SS  666341002            666341002                &&';
     public static Boolean SYSTEMDEBUG = false;
-    private final static String BLANK = 'BLANK';
-    /**
-    * @Description: Main
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => handleResult
+    * @author => Admin
+    * @purpose=> Main
+    * @created date=> 
+    ================================================*/
     public static  Map<String, String> handleResult(String result, String serviceName){
         if(SYSTEMDEBUG){
-            System.debug('Check result : '+result);
+            System.debug('Check handleResult entry : '+result);
         }
         Map<String, wlrcm__ResultFormatSegmentDirectory__mdt> resultFormatSegmentDirectory = getResultFormatSegmentDirectory(serviceName);
         Map<String, String> recordCodeWithResultSegment = getRecordCodeWithResultSegment(result, resultFormatSegmentDirectory);
@@ -26,28 +27,31 @@ public with sharing class CreditInquirySegmentHandler {
         Map<String, String> fieldMappingWithResultValue = getFieldMappingWithResultValue(resultLayoutSegments, recordCodeWithResultSegment);
         return fieldMappingWithResultValue;
     }
-    /**
-    * @Description: This method build map with Field API and Value from the result string.  This map is based on the wlrcm__FieldMapping__c in the resultLayoutSegment custom metadata
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getFieldMappingWithResultValue
+    * @author => Admin
+    * @purpose=> This method build map with Field API and Value from the result string.  This map is based on the wlrcm__FieldMapping__c in the resultLayoutSegment custom metadata
+    * @created date=> 
+    ================================================*/
     public static Map<String, String> getFieldMappingWithResultValue(Map<String, List<wlrcm__ResultLayoutSegment__mdt>> resultLayoutSegments, Map<String, String> recordCodeWithResultSegment){
+        
         Map<String, String> fieldMappingWithResultValue = new Map<String, String>();
         for(String str : recordCodeWithResultSegment.keySet()){
             for(wlrcm__ResultLayoutSegment__mdt rls : resultLayoutSegments.get(str)){
-                if(rls.wlrcm__FieldMapping__c != 'BLANK'){
+                if(rls.wlrcm__FieldMapping__c != CreditInquiryHTTPCallOutConstant.BLANK){
                     fieldMappingWithResultValue.put(String.valueOf(rls.wlrcm__FieldMapping__c),recordCodeWithResultSegment.get(str).mid(Integer.valueOf(rls.wlrcm__BytePosition__c),Integer.valueOf(rls.wlrcm__NumberOfBytes__c)));
-                    //System.debug('Check Description : '+ rls.wlrcm__FieldMapping__c + ' : '+ recordCodeWithResultSegment.get(str).mid(Integer.valueOf(rls.wlrcm__BytePosition__c),Integer.valueOf(rls.wlrcm__NumberOfBytes__c)));
+                   
                 }
             }
         }
         return fieldMappingWithResultValue;
     }
-    /**
-    * @Description: This method build map with all of the values from the custom metadata wlrcm__ResultLayoutSegment__mdt. and the RecordCode as the Key
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getResultLayoutSegments
+    * @author => Admin
+    * @purpose=> This method build map with all of the values from the custom metadata wlrcm__ResultLayoutSegment__mdt. and the RecordCode as the Key
+    * @created date=> 
+    ================================================*/
     public static Map<String, List<wlrcm__ResultLayoutSegment__mdt>> getResultLayoutSegments(String serviceName, Set<String> recordCodes){
 
         Map<String, List<wlrcm__ResultLayoutSegment__mdt>> resultLayoutSegments = new Map<String, List<wlrcm__ResultLayoutSegment__mdt>>();
@@ -68,12 +72,14 @@ public with sharing class CreditInquirySegmentHandler {
 
         return resultLayoutSegments;
     }
-    /**
-    * @Description: This method build a map with key value as the record code (FULL) and the string value from the result. 
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getRecordCodeWithResultSegment
+    * @author => Admin
+    * @purpose=> This method build a map with key value as the record code (FULL) and the string value from the result. 
+    * @created date=> 
+    ================================================*/
     public static Map<String, String> getRecordCodeWithResultSegment(String result, Map<String, wlrcm__ResultFormatSegmentDirectory__mdt> resultFormatSegmentDirectory){
+        
         Map<String, String> recordCodeWithResponseSegment = new Map<String, String>();
         Integer segmentLenghtCounter = 0;
         for(String str : resultFormatSegmentDirectory.keySet()){
@@ -85,13 +91,13 @@ public with sharing class CreditInquirySegmentHandler {
 
         return recordCodeWithResponseSegment;
     }
-    /**
-    * @Description: This method queries all of the segment elements from the wlrcm__ResultFormatSegmentDirectory__mdt custom metadata. 
-*                   This is to get the order of the segments
-    * @author: Admin
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+     /* ================================================
+    * @Method Name => getResultFormatSegmentDirectory
+    * @author => Admin
+    * @purpose=> This method queries all of the segment elements from the wlrcm__ResultFormatSegmentDirectory__mdt custom metadata. 
+    *                     This is to get the order of the segments
+    * @created date=> 
+    ================================================*/
     public static Map<String, wlrcm__ResultFormatSegmentDirectory__mdt> getResultFormatSegmentDirectory(String serviceName){
         Map<String, wlrcm__ResultFormatSegmentDirectory__mdt> resultFormatSegmentDirectory = new Map<String, wlrcm__ResultFormatSegmentDirectory__mdt>();
         for(wlrcm__ResultFormatSegmentDirectory__mdt rfsd : [SELECT Id,Label,wlrcm__Description__c,wlrcm__MaximumOccurrences__c,wlrcm__RecordCode__c,
