@@ -1,0 +1,1 @@
+{ "ExceptionType" : "Fatal", "UserExceptionMessage" : "A request with the supplied transactionId of :ABC1233470 has already been completed for this company." }
