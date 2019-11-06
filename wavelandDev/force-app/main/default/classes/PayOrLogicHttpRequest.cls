@@ -15,13 +15,8 @@ public with sharing class PayOrLogicHttpRequest {
     * @created date=> 
     ================================================*/
     public static void main(List<Id> contactIds){
-
-        if(SYSTEMDEBUG){
-            PayOrLogicCreateJsonRequest.SYSTEMDEBUG = true;
-            doHttpRequest(PayOrLogicCreateJsonRequest.createJSONRequest(contactIds), true);
-        }else{
-            doHttpRequest(PayOrLogicCreateJsonRequest.createJSONRequest(contactIds), false);
-        }
+        PayOrLogicCreateJsonRequest.SYSTEMDEBUG = SYSTEMDEBUG;
+        doHttpRequest(PayOrLogicCreateJsonRequest.createJSONRequest(contactIds));
     }
     /* ================================================
     * @Method Name => doHttpRequest
@@ -30,7 +25,7 @@ public with sharing class PayOrLogicHttpRequest {
     * @created date=> 
     ================================================*/
     @future(callout=true)
-    public static void doHttpRequest(Map<String, String> jsonRequest, Boolean systemDebug){
+    public static void doHttpRequest(Map<String, String> jsonRequest){
         wlrcm__HttpRequestSetting__mdt httpSetting = getHttpRequestSettings();
         HttpRequest req = new HttpRequest();
         req.setEndpoint(httpSetting.wlrcm__SetEndpoint__c);
@@ -40,9 +35,9 @@ public with sharing class PayOrLogicHttpRequest {
         req.setBody(jsonRequest.get(PayOrLogicConstants.JSONREQUEST));
         Http http = new Http();
         try{
-           checkResponseStatusCode(http.send(req), jsonRequest.get(PayOrLogicConstants.TRANSACTIONID), systemDebug);
+           checkResponseStatusCode(http.send(req), jsonRequest.get(PayOrLogicConstants.TRANSACTIONID));
         }catch(Exception e){
-            if(systemDebug){
+            if(SYSTEMDEBUG){
                 System.debug('External system is not responding : '+ e.getMessage() + ' Line Number : '+e.getLineNumber());
             }
             updateTransactionRecord(null,PayOrLogicConstants.FAILED, jsonRequest.get(PayOrLogicConstants.TRANSACTIONID));
@@ -54,17 +49,15 @@ public with sharing class PayOrLogicHttpRequest {
     * @purpose=> This method 
     * @created date=> 
     ================================================*/
-     public static  void  checkResponseStatusCode(HTTPResponse response, String transactionId, Boolean systemDebug){
+     public static  void  checkResponseStatusCode(HTTPResponse response, String transactionId){
 
         if(response.getStatusCode() == 200){
-            if(systemDebug){
+            if(SYSTEMDEBUG){
                 System.debug('System send this response : '+ response.getBody());
-                responseHandler(response, transactionId, true);
-            }else{
-                responseHandler(response, transactionId, false);
             }
+            responseHandler(response, transactionId);
         }else{
-            if(systemDebug){
+            if(SYSTEMDEBUG){
                 System.debug('System response with bad Status Code: '+response.getStatusCode() + ' : '+response.getBody());
             }
             throw new CustomException('System responded with bad Status Code  : '+response.getStatusCode());
@@ -76,13 +69,13 @@ public with sharing class PayOrLogicHttpRequest {
     * @purpose=> This method 
     * @created date=> 
     ================================================*/
-    public static void responseHandler(HTTPResponse response, String transactionId, Boolean systemDebug){
+    public static void responseHandler(HTTPResponse response, String transactionId){
         
         Map<String, Object> responseObj = (Map<String, Object>)System.JSON.deserializeUntyped(response.getBody());
         if(!responseObj.containsKey(PayOrLogicConstants.USEREXCEPTIONMESSAGE)){
             PayOrLogicResponseHandler.handleResponse(responseObj); 
         }else{
-            if(systemDebug){
+            if(SYSTEMDEBUG){
                 System.debug('System responded with Exception Message : '+responseObj.get(PayOrLogicConstants.USEREXCEPTIONMESSAGE));
             }
             updateTransactionRecord(responseObj, PayOrLogicConstants.FAILED, transactionId);

@@ -1,4 +1,4 @@
-  /* ================================================
+/* ================================================
  * @Class Name => PayOrLogicCreateJsonRequest
  * @author => Admin
  * @purpose=> 
@@ -191,4 +191,3 @@ public with sharing class PayOrLogicCreateJsonRequest {
         return transantion.Id;
     }
 }
-
