@@ -115,11 +115,12 @@ public with sharing class CreditInquirySegmentBuilder {
 
         return contactRecord;
     }
-    /**
-    * @Description: This method build wlrcm__InquiryLayoutSegment__mdt object. Where the wlrcm__Value__c field is equal to the Contact or Constant value
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => addContactToRequestSegmentProcedure
+    * @author => Admin
+    * @purpose=> This method build wlrcm__InquiryLayoutSegment__mdt object. Where the wlrcm__Value__c field is equal to the Contact or Constant value
+    * @created date=> 
+    ================================================*/
     public static List<wlrcm__InquiryLayoutSegment__mdt> addContactToRequestSegmentProcedure(List<wlrcm__InquiryLayoutSegment__mdt> inquiryLayoutSegment, Contact contactRecord){
         List<wlrcm__InquiryLayoutSegment__mdt> addContactToRequestSegmentProcedure = new List<wlrcm__InquiryLayoutSegment__mdt>();
 
@@ -139,12 +140,12 @@ public with sharing class CreditInquirySegmentBuilder {
         }
         return addContactToRequestSegmentProcedure;
     }
-    /**
-    * @Description: This method build the map with the segment identifier as key values
-    * @author: Admin
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getRequestSegmentsMap
+    * @author => Admin
+    * @purpose=>  This method build the map with the segment identifier as key values
+    * @created date=> 
+    ================================================*/
     public static Map<String, List<wlrcm__InquiryLayoutSegment__mdt>> getRequestSegmentsMap(List<wlrcm__InquiryLayoutSegment__mdt> inquiryLayoutSegment){
         Map<String, List<wlrcm__InquiryLayoutSegment__mdt>> requestSegmentsMap = new Map<String, List<wlrcm__InquiryLayoutSegment__mdt>>();
         for(wlrcm__InquiryLayoutSegment__mdt rsp : inquiryLayoutSegment){
@@ -156,12 +157,12 @@ public with sharing class CreditInquirySegmentBuilder {
         }
         return requestSegmentsMap;
     }
-    /**
-    * @Description: This method query all of the records in the custom metadata fields
-    * @author: Admin
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getInquiryLayoutSegment
+    * @author => Admin
+    * @purpose=>  This method query all of the records in the custom metadata fields
+    * @created date=> 
+    ================================================*/
     public static List<wlrcm__InquiryLayoutSegment__mdt> getInquiryLayoutSegment(String serviceName, Set<String> inquiryFormatSegmentDirectory){
 
         List<wlrcm__InquiryLayoutSegment__mdt> inquiryLayoutSegment = [SELECT DeveloperName,Id,Label,Language,MasterLabel,NamespacePrefix,QualifiedApiName,wlrcm__Value__c,
@@ -175,13 +176,12 @@ public with sharing class CreditInquirySegmentBuilder {
         
         return inquiryLayoutSegment;
     }
-    /**
-    * @Description: This method queries all of the segment elements from the wlrcm__InquiryFormatSegmentDirectory__mdt custom metadata. 
-                    This is to get the order of the segments
-    * @author: Admin
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getInquiryFormatSegmentDirectory
+    * @author => Admin
+    * @purpose=>  This method build the map with the segment identifier as key values
+    * @created date=> 
+    ================================================*/
     public static Set<String> getInquiryFormatSegmentDirectory(String serviceName){
         Set<String> inquiryFormatSegmentDirectory = new Set<String>();
         for(wlrcm__InquiryFormatSegmentDirectory__mdt sd : [SELECT DeveloperName,Id,Label,Language,MasterLabel,NamespacePrefix,QualifiedApiName,wlrcm__Description__c,
@@ -195,11 +195,12 @@ public with sharing class CreditInquirySegmentBuilder {
         }
         return inquiryFormatSegmentDirectory;
     }
-    /**
-    * @Description: This method build a Set with the sorted segment identifiers
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => getInquiryFormatSegmentDirectorySort
+    * @author => Admin
+    * @purpose=>  This method build a Set with the sorted segment identifiers
+    * @created date=> 
+    ================================================*/
     public static Set<String> getInquiryFormatSegmentDirectorySort(Set<String> inquiryFormatSegmentDirectory, Set<String> inquirySegments){
 
         Set<String> inquiryFormatSegmentDirectorySort = new Set<String>();
@@ -212,12 +213,12 @@ public with sharing class CreditInquirySegmentBuilder {
 
         return inquiryFormatSegmentDirectorySort;
     }
-    /**
-    * @Description: Adds padding to the string 
-    * @author: Admin
-    * @version: 1.0
-    * @since: 08/25/2019
-    */
+    /* ================================================
+    * @Method Name => addPadding
+    * @author => Admin
+    * @purpose=>  Adds padding to the string 
+    * @created date=> 
+    ================================================*/
     public static String addPadding(String str, Integer numberOfBytes, String align){
         if(align == RIGTH){ 
             str = str.leftPad(numberOfBytes,PLUS); 

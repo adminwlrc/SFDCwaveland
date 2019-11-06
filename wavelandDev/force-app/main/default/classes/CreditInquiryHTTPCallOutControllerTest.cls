@@ -28,7 +28,11 @@ private with sharing class CreditInquiryHTTPCallOutControllerTest {
         insert individual;
 
         Test.starttest();
+            CreditInquiryHTTPCallOutController.SYSTEMDEBUG = true;
             CreditInquiryHTTPCallOutController.getRequest('ID Report',individual[0].Id);
         Test.stoptest();
+        System.assertEquals('COPPERHEAD',[SELECT Id , wlrcm__StreetName__c FROM wlrcm__Equifax__c WHERE  wlrcm__Patient__c = : individual[0].Id].wlrcm__StreetName__c);
+
+        
     }
 }

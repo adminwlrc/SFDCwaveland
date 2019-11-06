@@ -18,9 +18,7 @@ public with sharing class CreditInquiryHTTPCallOutController {
     public static void getRequest(String serviceName, Id contactId){
         String inquiry = CreditInquirySegmentBuilder.buildInquiry(serviceName, contactId);
         String dial = CreditInquiryDialSegmentBuilder.buildDIAL(serviceName);
-        if(SYSTEMDEBUG){ 
-            System.debug('Check the inquiry :: '+dial+inquiry);
-        }
+       
         wlrcm__HttpRequestSetting__mdt httpRequestSettings = getHttpRequestSetting(serviceName);
         Map<String, String> resultValueMap = new Map<String, String>();
         if(httpRequestSettings != NULL){
@@ -28,6 +26,9 @@ public with sharing class CreditInquiryHTTPCallOutController {
         }
         if(resultValueMap.size() > 0){
            updateDemographicRecord(resultValueMap, contactId,serviceName);
+        }
+        if(SYSTEMDEBUG){ 
+            System.debug('Check the inquiry :: '+dial+inquiry);
         }
     }
     /* ================================================
