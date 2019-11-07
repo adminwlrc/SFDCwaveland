@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>ILS-0000000017</label>
+    <protected>false</protected>
+    <values>
+        <field>Align__c</field>
+        <value xsi:type="xsd:string">L</value>
+    </values>
+    <values>
+        <field>BytePosition__c</field>
+        <value xsi:type="xsd:double">126.0</value>
+    </values>
+    <values>
+        <field>Constant__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Co-Applicant First Name</value>
+    </values>
+    <values>
+        <field>FieldMapping__c</field>
+        <value xsi:type="xsd:string">BLANK</value>
+    </values>
+    <values>
+        <field>FieldType__c</field>
+        <value xsi:type="xsd:string">A/N</value>
+    </values>
+    <values>
+        <field>Format__c</field>
+        <value xsi:type="xsd:string">BLANK</value>
+    </values>
+    <values>
+        <field>IdentifierDescription__c</field>
+        <value xsi:type="xsd:string">IDNT</value>
+    </values>
+    <values>
+        <field>NumberOfBytes__c</field>
+        <value xsi:type="xsd:double">15.0</value>
+    </values>
+    <values>
+        <field>RequiredOptional__c</field>
+        <value xsi:type="xsd:string">O</value>
+    </values>
+    <values>
+        <field>SegmentIdentifier__c</field>
+        <value xsi:type="xsd:string">IDNT</value>
+    </values>
+    <values>
+        <field>ServiceName__c</field>
+        <value xsi:type="xsd:string">Recovery Report</value>
+    </values>
+    <values>
+        <field>Value__c</field>
+        <value xsi:type="xsd:string">BLANK</value>
+    </values>
+</CustomMetadata>

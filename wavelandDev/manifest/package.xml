@@ -1,36 +1,42 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
-        <members>*</members>
+        <members>CreditInquiryDialSegmentBuilder</members>
+        <members>CreditInquiryHTTPCallOutConstant</members>
+        <members>CreditInquiryHTTPCallOutController</members>
+        <members>CreditInquiryHTTPCallOutControllerTest</members>
+        <members>CreditInquiryHttpErrorHandler</members>
+        <members>CreditInquirySegmentBuilder</members>
+        <members>CreditInquirySegmentHandler</members>
+        <members>CustomException</members>
+        <members>DialSegmentBuilderTest</members>
+        <members>EligibilityInquiryHttpCallOutController</members>
+        <members>GenericMethods</members>
+        <members>PayOrLogicConstants</members>
+        <members>PayOrLogicConstantsTest</members>
+        <members>PayOrLogicCreateJsonRequest</members>
+        <members>PayOrLogicHttpRequest</members>
+        <members>PayOrLogicRequestHandlerTest</members>
+        <members>PayOrLogicResponseHandler</members>
+        <members>SegmentBuilderTest</members>
+        <members>TestFactory</members>
+        <members>sendEmail</members>
         <name>ApexClass</name>
-    </types>
-    <types>
-        <members>*</members>
-        <name>ApexComponent</name>
-    </types>
-    <types>
-        <members>*</members>
-        <name>ApexPage</name>
-    </types>
-    <types>
-        <members>*</members>
-        <name>ApexTestSuite</name>
-    </types>
-    <types>
-        <members>*</members>
-        <name>ApexTrigger</name>
-    </types>
-    <types>
-        <members>*</members>
-        <name>AuraDefinitionBundle</name>
-    </types>
-    <types>
-        <members>*</members>
-        <name>LightningComponentBundle</name>
     </types>
     <types>
         <members>*</members>
         <name>StaticResource</name>
     </types>
-    <version>45.0</version>
+    <types>
+        <members>*</members>
+        <name>CustomMetadata</name>
+    </types>
+    <types>
+        <members>wlrcm__TransactionTracker__c</members>
+        <members>wlrcm__PayOrLogic__c</members>
+        <members>wlrcm__PayOrLogic__c</members>
+        <members>wlrcm__Equifax__c</members>
+        <name>CustomObject</name>
+    </types>
+    <version>47.0</version>
 </Package>

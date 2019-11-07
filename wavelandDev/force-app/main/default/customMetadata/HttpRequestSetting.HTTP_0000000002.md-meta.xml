@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>HTTP-0000000002</label>
+    <protected>false</protected>
+    <values>
+        <field>EncodingScheme__c</field>
+        <value xsi:type="xsd:string">UTF-8</value>
+    </values>
+    <values>
+        <field>Environment__c</field>
+        <value xsi:type="xsd:string">acroxmltest</value>
+    </values>
+    <values>
+        <field>HeaderKey1__c</field>
+        <value xsi:type="xsd:string">Content-Type</value>
+    </values>
+    <values>
+        <field>HeaderKey2__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>HeaderValue1__c</field>
+        <value xsi:type="xsd:string">application/x-www-form-urlencoded</value>
+    </values>
+    <values>
+        <field>HeaderValue2__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>PayloadKey1__c</field>
+        <value xsi:type="xsd:string">service_name=</value>
+    </values>
+    <values>
+        <field>PayloadKey2__c</field>
+        <value xsi:type="xsd:string">&amp;site_id=</value>
+    </values>
+    <values>
+        <field>PayloadKey3__c</field>
+        <value xsi:type="xsd:string">&amp;efx_request=</value>
+    </values>
+    <values>
+        <field>ServiceName__c</field>
+        <value xsi:type="xsd:string">Recovery Report</value>
+    </values>
+    <values>
+        <field>SetEndpoint__c</field>
+        <value xsi:type="xsd:string">callout:Equifax</value>
+    </values>
+    <values>
+        <field>SetMethod__c</field>
+        <value xsi:type="xsd:string">POST</value>
+    </values>
+    <values>
+        <field>SiteId__c</field>
+        <value xsi:type="xsd:string">50690</value>
+    </values>
+</CustomMetadata>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>RFSD-0000000055</label>
+    <protected>false</protected>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Fraud/Verification Alert</value>
+    </values>
+    <values>
+        <field>MaximumOccurrences__c</field>
+        <value xsi:type="xsd:string">99</value>
+    </values>
+    <values>
+        <field>OptionalStandard__c</field>
+        <value xsi:type="xsd:string">Optional</value>
+    </values>
+    <values>
+        <field>RecordCodeBytes__c</field>
+        <value xsi:type="xsd:double">2.0</value>
+    </values>
+    <values>
+        <field>RecordCode__c</field>
+        <value xsi:type="xsd:string">FV</value>
+    </values>
+    <values>
+        <field>SegmentCounter__c</field>
+        <value xsi:type="xsd:string">53</value>
+    </values>
+    <values>
+        <field>SegmentLength__c</field>
+        <value xsi:type="xsd:double">213.0</value>
+    </values>
+    <values>
+        <field>ServiceName__c</field>
+        <value xsi:type="xsd:string">ID Report</value>
+    </values>
+    <values>
+        <field>Sort__c</field>
+        <value xsi:type="xsd:double">14.0</value>
+    </values>
+</CustomMetadata>
