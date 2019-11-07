@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>RLS 0000000670</label>
+    <protected>false</protected>
+    <values>
+        <field>Align__c</field>
+        <value xsi:type="xsd:string">BLANK</value>
+    </values>
+    <values>
+        <field>BytePosition__c</field>
+        <value xsi:type="xsd:double">4.0</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Model Number: 05168   MarketMax 4.0 02957   ID Score Risk</value>
+    </values>
+    <values>
+        <field>FieldMapping__c</field>
+        <value xsi:type="xsd:string">BLANK</value>
+    </values>
+    <values>
+        <field>FieldType__c</field>
+        <value xsi:type="xsd:string">N</value>
+    </values>
+    <values>
+        <field>Format__c</field>
+        <value xsi:type="xsd:string">05168 or 02957</value>
+    </values>
+    <values>
+        <field>LayoutSegment__c</field>
+        <value xsi:type="xsd:string">MarketMax and/or ID Score Risk</value>
+    </values>
+    <values>
+        <field>NumberOfBytes__c</field>
+        <value xsi:type="xsd:double">5.0</value>
+    </values>
+    <values>
+        <field>RecordCode__c</field>
+        <value xsi:type="xsd:string">MM</value>
+    </values>
+    <values>
+        <field>ServiceName__c</field>
+        <value xsi:type="xsd:string">ID Report</value>
+    </values>
+</CustomMetadata>
